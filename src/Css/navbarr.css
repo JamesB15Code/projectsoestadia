@@ -1,0 +1,38 @@
+.navbar-custom {
+    background-color: #0424D9;
+    
+  }
+  
+  .navbar-custom .navbar-brand {
+    color: #ffffff;
+  }
+  
+  .navbar-custom .navbar-nav .nav-link {
+    color: #ffffff;
+    padding: 15px;
+  }
+  
+  .navbar-custom .navbar-nav .nav-link:hover {
+    color: #ffffff;
+  }
+  /* Estilos para la animación de entrada */
+.navbar-enter {
+  opacity: 0;
+}
+
+.navbar-enter-active {
+  opacity: 1;
+  transition: opacity 500ms;
+}
+
+/* Estilos para la animación de salida */
+.navbar-exit {
+  opacity: 1;
+}
+
+.navbar-exit-active {
+  opacity: 0;
+  transition: opacity 500ms;
+}
+
+  

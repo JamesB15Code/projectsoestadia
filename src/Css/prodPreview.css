@@ -1,0 +1,85 @@
+
+.contenedor {
+    width: 100%;
+    overflow: hidden;
+    padding: 20px;
+    border: 15px;
+    background: #056CF2;        
+}
+
+.contenedor h2{
+    color: #fff;
+}
+
+
+.galeria-port{
+    display: flex;
+    justify-content: space-evenly;
+    flex-wrap: wrap;
+    
+}
+
+.imagen-port{
+    width: 25%;
+    margin: 10px;
+    overflow: hidden;
+    position: relative;
+    cursor: pointer;
+    text-align: center;
+}
+
+.imagen-port > img{
+    width: 100%;
+    object-fit: cover;
+    display: block;
+}
+.card-title {
+    color: #0554F2;
+    font-size: 20px;
+    font-weight: bold;
+  }
+
+.descProducto{
+    color: #0554F2;
+    margin-top: 10px;
+    font-size: 16px;
+}
+
+.btnvermas{
+    display: inline-block;
+    padding: 9px 20px;
+    background-color: #86b7fea8;
+    color: #2e3a7c;
+    text-decoration: none;
+    border-radius: 23px;
+    font-weight: bold;
+    transition: background-color 0.3s ease-in-out;
+}
+
+.btnvermas:hover {
+    background-color: #5ec5f5;
+  }
+
+
+@media screen and (max-width:768px){
+    .imagen-port{
+        width: 44%;
+    }
+
+}
+
+@media screen and (max-width:480px){
+    .imagen-port{
+        width: 95%;
+    }
+
+    
+}
+
+
+.uno span {
+    opacity: 0;
+    display: inline-block;
+    animation: animate 1s linear forwards;
+    -webkit-animation: animate 1s linear forwards;
+}
