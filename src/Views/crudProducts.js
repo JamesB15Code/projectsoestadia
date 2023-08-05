@@ -1,12 +1,12 @@
 import React from 'react'
-import CrudTelefonos from '../Components/crudPhones'
+import CrudProducts from '../Components/crudProducts'
 import Admin from '../Components/navbar2'
 
-export default function crudPhones() {
+export default function crudProducts() {
   return (
     <div>
       <Admin/>
-      <CrudTelefonos/>
+      <CrudProducts/>
     </div>
   )
 }

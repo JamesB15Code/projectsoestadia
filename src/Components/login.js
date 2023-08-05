@@ -1,50 +1,42 @@
-import React, { useContext, useState } from "react";
+import { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../Auth/AuthProvider";
-import logo from "../img/logo.png";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
+import { faHouse, faEye, faEyeSlash, } from "@fortawesome/free-solid-svg-icons";
+import imagen1 from "../img/Imagen1.png";
 
 export default function Login() {
-  const url = "https://innovaciones-apis.vercel.app/api/users";
-  const { login } = useContext(AuthContext);
-  const navigate = useNavigate();
-  const [username, setUsername] = useState("");
-  const [contraseña, setContraseña] = useState("");
+  const URL_USER = "http://localhost/proyectoApi/apiUsuario.php";
+  const histori = useNavigate();
+  const {login } = useContext(AuthContext);
   const [email, setEmail] = useState("");
-  const [passwordError, setPasswordError] = useState("");
+  const [pass, setPass] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
-
   const [showPassword, setShowPassword] = useState(false);
+  
 
-  const togglePasswordVisibility = () => {
-    setShowPassword(!showPassword);
-  };
-
-  const handleLogin = (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-
-    fetch(url)
+    fetch(URL_USER)
       .then((response) => response.json())
       .then((data) => {
-        const foundUser = data.find(
-          (u) =>
-            u.email === email &&
-            u.contraseña === contraseña &&
-            u.username === username
+        const user = data.find(
+          (u) => u.correo === email && u.contraseña === pass
         );
-        if (foundUser) {
-          login(foundUser);
-          if (foundUser.rol[0].rol === "Usuario") {
-            navigate("/perfil");
+        if (user) {
+          login(user); // Guardar usuario en el contexto al iniciar sesión
+          
+          if (user.rol === "usuario") {
+            histori("/perfilUser");
           } else {
-            navigate("/admin");
+            histori("/admin");
           }
         } else {
           setErrorMessage(
             "El correo electrónico o la contraseña son incorrectos"
           );
         }
+        console.log(user);
       })
       .catch((error) => {
         console.error(error);
@@ -52,112 +44,92 @@ export default function Login() {
       });
   };
 
+  const handleHome = () => {
+    histori("/"); // Redirige al inicio 
+  };
+
   return (
-    <div className="">
-      <main id="main" className="d-flex w-100 mt-5 mb-3 align-items-center">
-        <div className="container d-flex flex-column mt-5">
-          <div className="row mt-5">
-            <div className="col-lg-5 mx-auto d-table h-100">
-              <div className="d-table-cell align-middle">
-                <div className="card card-login rounded-5 bg-light">
-                  <div className="card-body">
-                    <div className="m-sm-1">
-                      <div className="text-center mb-2">
-                        <img
-                          src={logo}
-                          alt="Logo"
-                          className="img-fluid"
-                          width="100"
-                        />
-                      </div>
-                      {errorMessage !== "" && (
-                        <label className="color-red text-center">
-                          {errorMessage}
-                        </label>
-                      )}
-                      <form onSubmit={handleLogin}>
-                        <div className="mb-2">
-                          <label
-                            htmlFor="email"
-                            className="form-label mb-1 text-primary ms-3"
-                          >
-                            Correo electrónico
-                          </label>
-                          <input
-                            id="email"
-                            className="form-control form-control-lg input-login rounded-5"
-                            type="email"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            placeholder="Introduce tu correo electrónico"
-                            required
-                          />
-                        </div>
-                        <div className="mb-2">
-                          <label
-                            htmlFor="password"
-                            className="form-label mb-1 text-primary ms-3"
-                          >
-                            Contraseña
-                          </label>
-                          <div className="input-group">
-                            <input
-                              id="password"
-                              className="form-control form-control-lg input-login rounded-5"
-                              type={showPassword ? "text" : "password"}
-                              value={contraseña}
-                              onChange={(e) => setContraseña(e.target.value)}
-                              placeholder="Ingresa tu contraseña"
-                              required
-                            />
-                            <button
-                              type="button"z
-                              className="btn"
-                              onClick={togglePasswordVisibility}
-                            >
-                              <FontAwesomeIcon
-                                icon={showPassword ? faEyeSlash : faEye}
-                              />
-                            </button>
-                          </div>
-                          {passwordError !== "" && (
-                            <label className="color-red text-center">
-                              {passwordError}
-                            </label>
-                          )}
-                        </div>
+    
+    <div className="d-flex flex-column min-vh-100">
+      <main className="flex-grow-1 container mt-5 mb-5">
+        <div className="row justify-content-center">
 
-                        <div className="text-center mt-3">
-                          <input
-                            type="submit"
-                            className="btn btn-primary rounded-5"
-                            value="Iniciar sesión"
-                          />
-                        </div>
-
-                        <div className="account fs-5">
-                          <div className="mt-2 d-flex justify-content-evenly align-items-center">
-                            <a
-                              href="/recuperacion"
-                              className="text-decoration-none"
-                            >
-                              ¿Se te olvidó tu contraseña?
-                            </a>
-                            <a
-                              href="/registro"
-                              className="text-decoration-none"
-                            >
-                              Registrate
-                            </a>
-                          </div>
-                        </div>
-                      </form>
-                    </div>
-                  </div>
-                </div>
-              </div>
+          <div className=" border col-lg-5 p-4 ">
+            <div className="text-center">
+              <h1 className="text-primary fs-3 mt-5 mb-3">Iniciar sesión</h1>
             </div>
+            <form className="" onSubmit={handleSubmit}>
+              <div className="mb-3">
+                <label className="form-label text-primary fs-5">
+                  Correo Electronico
+                </label>
+                <input
+                  className="form-control text-secondary  fs-5"
+                  type="email"
+                  name="Email"
+                  value={email}
+                  placeholder="Ingrese su correo"
+                  onChange={(e) => setEmail(e.target.value)}
+                />
+              </div>
+              <div className=" mb-3">
+                <label className="form-label text-primary fs-5">
+                  Contraseña
+                </label>
+                <div className="input-group mb-3 ">
+                    <input
+                      className="form-control fs-5 text-secondary "
+                      type={showPassword ? "text" : "password"}
+                      name="Password"
+                      value={pass}
+                      placeholder="Introduce tu contraseña"
+                      onChange={(e) => setPass(e.target.value)}
+                    />
+                    <button
+                      type="button"
+                      className="btn btn-outline-secondary"
+                      onClick={() => setShowPassword(!showPassword)}
+                    >
+                      {showPassword ? (
+                        <FontAwesomeIcon icon={faEyeSlash} />
+                      ) : (
+                        <FontAwesomeIcon icon={faEye} />
+                      )}
+                    </button>
+                  </div>
+              </div>
+              <div className="text-center mt-3">
+                <input
+                  className="btn btn-primary rounded-5 fs-5"
+                  type="submit"
+                  value="Iniciar sesión"
+                />
+              </div>
+              <div className="text-center mt-3 mb-3">
+                <a className="text-decoration-none fs-5" href="recuperarPass">
+                  ¿Se te olvidó la contraseña?
+                </a>
+              </div>
+            </form>
+            {errorMessage !== "" && (
+              <label className="text-danger text-center fs-5">
+                {errorMessage}
+              </label>
+            )}
           </div>
+
+          <div className="col-lg-5  border-0 d-none d-lg-block">
+            <img src={imagen1} width="100%" height="auto" alt=""/>
+          </div>
+        </div>
+
+        <div className="d-flex justify-content-start m-4">
+          <button
+            className="btn btn-primary fs-5"
+            onClick={handleHome}
+          >
+            <FontAwesomeIcon icon={faHouse} />
+          </button>
         </div>
       </main>
     </div>

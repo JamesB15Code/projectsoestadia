@@ -95,7 +95,7 @@ function HomeScreen() {
     .then(data => {
       console.log('Respuesta del servidor:', data);
       show_alerta("¡Compra realizada con éxito!");
-      //actualizarExistenciaProducto();
+      actualizarExistenciaProducto();
     })
     .catch(error => {
       console.error(error);
@@ -103,7 +103,7 @@ function HomeScreen() {
     });
   };
 
-  /*const actualizarExistenciaProducto = async () => {
+  const actualizarExistenciaProducto = async () => {
     const resultadoExistencia = selectedProduct.existencia - cantidad;
 
     fetch(`${URL_PRODUCTOS}?idProducto=${selectedProduct.idProducto}`, {
@@ -133,7 +133,7 @@ function HomeScreen() {
     .catch(error => {
       console.error(error);
     });
-  }*/
+  }
 
   const handleCloseModal = () => {
     setShowModal(false);
@@ -154,7 +154,7 @@ function HomeScreen() {
       (marcaLC.includes(searchTermLC) ||
       modeloLC.includes(searchTermLC) ||
       colorLC.includes(searchTermLC)) &&
-      product.categoria === "Smartphone"
+      product.categoria === "Tablets"
     );
   });
 
@@ -165,7 +165,7 @@ function HomeScreen() {
           <input
             type="text"
             className="form-control"
-            placeholder="Buscar producto..."
+            placeholder="Buscar por marca..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
@@ -176,7 +176,7 @@ function HomeScreen() {
               key={product.idProducto}
               className="col-md-4 mb-4 d-flex justify-content-center"
             >
-              <div className="border shadow p-4 h-100 border-5d ">
+              <div className="card h-100 border-5d ">
                 <img
                   src={product.imagen}
                   alt="Producto"
@@ -319,7 +319,7 @@ function HomeScreen() {
                     id="no2"
                     min="1"
                     tabIndex="2"
-                    defaultValue="1" // Establecer valor predeterminado a 1
+                    defaultValue="1" 
                     onChange={(e) => setCantidad(e.target.value)}
                   />
                 </div>

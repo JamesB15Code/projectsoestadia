@@ -20,14 +20,16 @@ import {
   InstagramIcon,
 } from "../iconos";
 
-import { URL_REDES, URL_INFOEMPRESA } from "../Url";
+
 
 function Footer() {
   const [redes, setRedes] = useState([]);
   const [infEmpresa, setInfEmpresa] = useState({});
   const [showModal, setShowModal] = useState(false);
   const [modalData, setModalData] = useState({});
-
+  const URL_INFOEMPRESA = "http://localhost/proyectoApi/apiEmpresa.php";
+  const URL_REDES = "http://localhost/proyectoApi/apiRedesSociales.php";
+  
   useEffect(() => {
     getRedes();
     getInformacionEmpresa();

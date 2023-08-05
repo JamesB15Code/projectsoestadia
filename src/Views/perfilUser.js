@@ -1,14 +1,15 @@
 import React from 'react'
-import Admin from '../Components/perfiladmin'
-import Navbar2 from '../Components/navbar2'
+import Perfil from '../Components/perfil'
+import Navbar from '../Components/navbar'
 import Fotter from '../Components/footerr'
+
 
 export default function PerfilUser() {
   return (
     <div>
-      <Navbar2/>
+      <Navbar/>
       <br/>
-      <Admin/>
+      <Perfil/>
       <Fotter/>
     </div>
   )

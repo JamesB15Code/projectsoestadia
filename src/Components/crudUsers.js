@@ -1,130 +1,121 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
+import axios from "axios";
 import Swal from "sweetalert2";
-import withReactContent from "sweetalert2-react-content";
-import { URL_USERS } from "../Url";
+import { show_alerta } from "../funtions";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faTrash, faEdit, faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 
-const CrudUser = () => {
+const CrudUsarios = () => {
+  const [users, setUsers] = useState([]);
+  const [id, setId] = useState("");
   const [nombre, setNombre] = useState("");
   const [username, setUsername] = useState("");
+  const [correo, setCorreo] = useState("");
   const [contraseña, setContraseña] = useState("");
-  const [email, setEmail] = useState("");
+  const [pregunta, setPregunta] = useState("");
+  const [respuesta, setRespuesta] = useState("");
   const [rol, setRol] = useState("");
+  const [opcion, setOpcion] = useState("");
+  const [titulo, setTitulo] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [items, setItems] = useState([]);
-  const [error, setError] = useState("");
-  const [editItemId, setEditItemId] = useState("");
-  const [isFormVisible, setFormVisibility] = useState(false);
+  const url = "http://localhost/proyectoApi/apiUsuario.php";
 
-  const handleSubmit = async (e) => {
-    const MySwal = withReactContent(Swal);
-    e.preventDefault();
-    if (!nombre || !username || !contraseña || !email || !rol) {
-      MySwal.fire({
-        title: "Campos incompletos",
-        icon: "error",
-        text: "Por favor complete todos los campos del formulario",
-      });
+  useEffect(() => {
+    getUser();
+  }, []);
+
+  const getUser = async () => {
+    const res = await axios.get(url);
+    setUsers(res.data);
+  };
+
+  const openEditor = (op, idUsuarios, nombre, username, contraseña, correo, pregunta, respuesta, rol) => {
+    setId("");
+    setNombre("");
+    setUsername("");
+    setContraseña("");
+    setCorreo("");
+    setPregunta("");
+    setRespuesta("");
+    setRol("");
+    setOpcion(op);
+    if (op === 1) {
+      setTitulo("Registrar");
+    } else if (op === 2) {
+      setTitulo("Editar");
+      setId(idUsuarios);
+      setNombre(nombre);
+      setUsername(username);
+      setContraseña(contraseña);
+      setCorreo(correo);
+      setPregunta(pregunta);
+      setRespuesta(respuesta);
+      setRol(rol);
+    }
+    window.setTimeout(function () {
+      document.getElementById("nombre").focus();
+    }, 500);
+  };
+
+  const validar = () => {
+    if (!nombre || !contraseña || !correo || !username || !pregunta || !respuesta || !rol) {
+      show_alerta("Completa todos los campos", "warning");
       return;
     }
-    setLoading(true);
+
+    const parametros1 = {
+      nombre: nombre,
+      username: username,
+      contraseña: contraseña,
+      correo: correo,
+      pregunta: pregunta,
+      respuesta: respuesta,
+      idRol: rol
+    };
+    const parametros = {
+      nombre: nombre,
+      username: username,
+      contraseña: contraseña,
+      correo: correo,
+      pregunta: pregunta,
+      respuesta: respuesta,
+      idRol: rol
+    };
+
+    if (opcion === 1) {
+      guardar(parametros1);
+    } else {
+      editar(parametros, id);
+    }
+  };
+
+  const guardar = async (parametros1) => {
     try {
-      if (editItemId) {
-        const itemToUpdate = items.find((item) => item._id === editItemId);
-        if (!itemToUpdate) {
-          setError("El elemento a actualizar no existe");
-          setLoading(false);
-          return;
-        }
-        const updatedItem = {
-          ...itemToUpdate,
-          nombre: nombre,
-          username: username,
-          contraseña: contraseña,
-          email: email,
-          rol: rol,
-        };
-        await fetch(`${URL_USERS}/${itemToUpdate._id}`, {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(updatedItem),
-        });
-        setItems((prevItems) =>
-          prevItems.map((item) =>
-            item._id === editItemId ? updatedItem : item
-          )
-        );
-        setNombre("");
-        setUsername("");
-        setContraseña("");
-        setEmail("");
-        setRol("");
-        setEditItemId("");
-        MySwal.fire({
-          title: "Registro actualizado correctamente",
-          icon: "success",
-        });
-      } else {
-        const res = await fetch(URL_USERS, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            nombre: nombre,
-            username: username,
-            contraseña: contraseña,
-            email: email,
-            rol: rol,
-          }),
-        });
-        const newItem = await res.json();
-        setItems((prevItems) => [...prevItems, newItem]);
-        setNombre("");
-        setUsername("");
-        setContraseña("");
-        setEmail("");
-        setRol("");
-
-        MySwal.fire({
-          title: "Registro agregado correctamente",
-          icon: "success",
-        });
-      }
+      const response = await axios.post(url, parametros1);
+      show_alerta("Guardado", "success");
+      getUser();
     } catch (error) {
-      setError("Error al guardar el registro");
+      show_alerta("Error al guardar", "error");
+      console.log(error);
     }
-    setLoading(false);
   };
 
-  const handleEdit = (itemId) => {
-    const itemToEdit = items.find((item) => item._id === itemId);
-    if (!itemToEdit) {
-      setError("El elemento a editar no existe");
-      return;
+  const editar = async (parametros, idUsuarios) => {
+    try {
+      await axios.put(`${url}?idUsuarios=${idUsuarios}`, parametros);
+      show_alerta("Actualizado", "success");
+      getUser();
+    } catch (error) {
+      show_alerta("Error al editar", "error");
+      console.log(error);
     }
-    setNombre(itemToEdit.nombre);
-    setUsername(itemToEdit.username);
-    setContraseña(itemToEdit.contraseña);
-    setEmail(itemToEdit.email);
-    setRol(itemToEdit.rol);
-    setEditItemId(itemId);
-    setFormVisibility(true);
   };
 
-  const handleDelete = async (itemId, nombre) => {
-    const MySwal = withReactContent(Swal);
-    const itemToDelete = items.find((item) => item._id === itemId);
-    if (!itemToDelete) {
-      setError("El elemento a eliminar no existe");
-      return;
-    }
-    MySwal.fire({
-      title: "¿Estás seguro de eliminar " + nombre + " ?",
-      text: "No podrás revertir esta acción",
-      icon: "warning",
+  const eliminar = (idUsuarios, username) => {
+    Swal.fire({
+      title: `¿Estás seguro de eliminar a ${username}?`,
+      text: "Esta acción no se puede revertir",
+      icon: "question",
       showCancelButton: true,
       confirmButtonColor: "#d33",
       cancelButtonColor: "#3085d6",
@@ -133,216 +124,179 @@ const CrudUser = () => {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          await fetch(`${URL_USERS}/${itemToDelete._id}`, {
-            method: "DELETE",
-          });
-          setItems((prevItems) =>
-            prevItems.filter((item) => item._id !== itemId)
-          );
-          MySwal.fire({
-            title: "Registro eliminado correctamente",
-            icon: "success",
-          });
+          await axios.delete(`${url}?idUsuarios=${idUsuarios}`);
+          show_alerta("Eliminado", "success");
+          getUser();
         } catch (error) {
-          setError("Error al eliminar el registro");
+          show_alerta("Error al eliminar", "error");
+          console.log(error);
         }
       }
     });
   };
 
-  useEffect(() => {
-    const fetchItems = async () => {
-      setLoading(true);
-      try {
-        const res = await fetch(URL_USERS);
-        const data = await res.json();
-        setItems(data);
-      } catch (error) {
-        setError("Error al cargar los registros");
-      }
-      setLoading(false);
-    };
-    fetchItems();
-  }, []);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      fetchItems(); // Vuelve a llamar a la función fetchItems para actualizar los datos
-    }, 5000); // Actualiza cada 5 segundos (ajusta el intervalo según tus necesidades)
-
-    return () => clearInterval(interval); // Limpia el intervalo al desmontar el componente
-
-    async function fetchItems() {
-      try {
-        const res = await fetch(URL_USERS);
-        const data = await res.json();
-        setItems(data);
-      } catch (error) {
-        setError("Error al cargar los registros");
-      }
-    }
-  }, []);
-
   return (
-    <div className="container mt-5">
-      {error && <p>{error}</p>}
-      {isFormVisible ? (
-        <div className="modal" style={{ display: "block" }}>
-          <div className="modal-dialog">
-            <div className="modal-content">
-              <form onSubmit={handleSubmit}>
-                <div className="modal-header">
-                  <h5 className="modal-title">Agregar/Editar Registro</h5>
-                  <button
-                    type="button"
-                    className="btn-close"
-                    onClick={() => setFormVisibility(false)}
-                  />
-                </div>
-                <div className="modal-body">
-                  <div className="row mb-3 ">
-                    <div className="col ">
-                      <label className="form-label">Nombre</label>
-                      <input
-                        type="text"
-                        value={nombre}
-                        onChange={(e) => setNombre(e.target.value)}
-                        className="form-control"
-                        placeholder="nombre"
-                        name="Nombre"
-                      />
-                    </div>
-                    <div className="col">
-                      <label className="form-label">Contraseña</label>
-                      <div className="input-group">
-                        <input
-                          type={showPassword ? "text" : "password"}
-                          value={contraseña}
-                          onChange={(e) => setContraseña(e.target.value)}
-                          className="form-control"
-                          placeholder="Contraseña"
-                        />
+    <div className="container">
+      <div className="App">
+        <div className="container-fluid">
+          <div className="row mt-5">
+            <div className="col-md-3 offset-md-4 mt-4">
+              <div className="d-grid mx-auto mt-4">
+              <h5 className="text-center fs-5">Gestión de usuarios</h5>
+                <button className="btn btn-success" onClick={() => openEditor(1)}>
+                  Agregar
+                </button>
+              </div>
+            </div>
+          </div>
+          <div className="row mt-3">
+          <div className="col-lg-12 ">
+            <div className="table-responsive">
+              <table className="table table-bordered">
+                <thead>
+                  <tr>
+                    <th>id</th>
+                    <th>Nombre</th>
+                    <th>Username</th>
+                    <th>contraseña</th>
+                    <th>correo</th>
+                    <th>Pregunta</th>
+                    <th>Respuesta</th>
+                    <th>Rol</th>
+                    <th>Acción</th>
+                  </tr>
+                </thead>
+                <tbody className="table-group-divider">
+                  {users.map(({ idUsuarios, nombre, username, contraseña, correo, pregunta, respuesta, idRol }, i) => (
+                    <tr key={idUsuarios}>
+                      <td>{(i + 1)}</td>
+                      <td>{nombre}</td>
+                      <td>{username}</td>
+                      <td>{contraseña}</td>
+                      <td>{correo}</td>
+                      <td>{pregunta}</td>
+                      <td>{respuesta}</td>
+                      { (idRol === '2') ? <td>admin</td> : <td>usuario</td> }
+                      <td className="d-flex justify-content-center">
                         <button
-                          type="button"
-                          className="btn btn-outline-primary"
-                          onClick={() => setShowPassword(!showPassword)}
+                          onClick={() => openEditor(2, idUsuarios, nombre, username, contraseña, correo, pregunta, respuesta, idRol)}
+                          className="btn btn-primary"
                         >
-                          {showPassword ? "Ocultar" : "Mostrar"}
+                          <FontAwesomeIcon icon={faEdit} />
                         </button>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="row mb-3">
-                    <div className="col">
-                      <label className="form-label">Nombre usuario</label>
-                      <input
-                        type="text"
-                        value={username}
-                        onChange={(e) => setUsername(e.target.value)}
-                        className="form-control"
-                        placeholder="Nombre usuario"
-                      />
-                    </div>
-                  </div>
-                  <div className="row mb-4">
-                    <div className="col">
-                      <label className="form-label">Correo</label>
-                      <input
-                        type="text"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        className="form-control"
-                        placeholder="Correo"
-                      />
-                    </div>
-                    <div className="col">
-                      <label className="form-label">Rol</label>
-                      <select
-                        id="rol"
-                        type="text"
-                        value={rol}
-                        onChange={(e) => setRol(e.target.value)}
-                        className="form-control"
-                        placeholder="Rol"
-                      >
-                        <option value="">Seleciona rol</option>
-                        <option value="user">user</option>
-                        <option value="admin">admin</option>
-                      </select>
-                    </div>
-                  </div>
-                </div>
-                <div className="modal-footer">
-                  <button
-                    type="submit"
-                    className="btn btn-primary me-2"
-                  >
-                    Guardar
-                  </button>
-                  <button
-                    type="button"
-                    className="btn btn-secondary"
-                    onClick={() => setFormVisibility(false)}
-                  >
-                    Cancelar
-                  </button>
-                </div>
-              </form>
+                        &nbsp;
+                        <button
+                          className="btn btn-danger"
+                          onClick={() => eliminar(idUsuarios, username)}
+                        >
+                          <FontAwesomeIcon icon={faTrash} />
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+          </div>
+        </div>
+      </div>
+     
+      
+      {opcion !== "" && (
+        <div className="modal fade show" style={{ display: "block", backgroundColor: "rgba(0,0,0,0.4)" }}>
+          <div className="modal-dialog modal-dialog-centered">
+            <div className="modal-content">
+              <div className="modal-header">
+              <label className="h5">{titulo}</label>
+              <button type="button" className="btn-close" onClick={() => setOpcion("")}></button>
+            </div>
+            <div className="modal-body">
+              <div className="input-group mb-3">
+                <input
+                  type="text"
+                  className="form-control"
+                  id="nombre"
+                  placeholder="Nombre"
+                  value={nombre}
+                  onChange={(e) => setNombre(e.target.value)}
+                />
+              </div>
+              <div className="input-group mb-3">
+                <input
+                  type="text"
+                  className="form-control"
+                  placeholder="Nombre usuario"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                />
+              </div>
+              <div className="input-group mb-3">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  className="form-control"
+                  id="contraseña"
+                  placeholder="Contraseña"
+                  value={contraseña}
+                  onChange={(e) => setContraseña(e.target.value)}
+                /><button
+                  type="button"
+                  className="btn btn-outline-secondary"
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  {showPassword ? <FontAwesomeIcon icon={faEyeSlash} /> : <FontAwesomeIcon icon={faEye} />}
+                </button>
+              </div>
+              <div className="input-group mb-3">
+                <input
+                  type="email"
+                  className="form-control"
+                  id="correo"
+                  placeholder="Correo"
+                  value={correo}
+                  onChange={(e) => setCorreo(e.target.value)}
+                />
+              </div>
+              <div className="input-group mb-3">
+                <select className="form-control" id="pregunta" value={pregunta} onChange={(e) => setPregunta(e.target.value)}>
+                  <option value="">selecciona una pregunta</option>
+                  <option value="¿Cúal es tu color favorito?">¿Cúal es tu color favorito?</option>
+                  <option value="¿cúal es tu comida favorita?">¿cúal es tu comida favorita?</option>
+                </select>
+              </div>
+              <div className="input-group mb-3">
+                <input
+                  type="text"
+                  className="form-control"
+                  placeholder="Respuesta"
+                  value={respuesta}
+                  onChange={(e) => setRespuesta(e.target.value)}
+                />
+              </div>
+              <div className="input-group mb-3">
+                <select className="form-control" id="rol" value={rol} onChange={(e) => setRol(e.target.value)}>
+                  <option value="">Selecciona rol</option>
+                  <option value="1">usuario</option>
+                  <option value="2">admin</option>
+                </select>
+              </div>
+              <div className="d-grid col-6 mx-auto">
+                <button className="btn btn-success" onClick={() => validar()}>
+                  Guardar
+                </button>
+              </div>
+            </div>
+            <div className="modal-footer">
+              <button className="btn btn-secondary" onClick={() => setOpcion("")}>
+                Cerrar
+              </button>
+            </div>
             </div>
           </div>
         </div>
-      ) : (
-        <div className="m-2 mt-5">
-          <button
-            type="button"
-            className="btn btn-primary mt-5"
-            onClick={() => setFormVisibility(true)}
-          >
-            Agregar un nuevo admin
-          </button>
-        </div>
       )}
-      <table className="table">
-        <thead>
-          <tr>
-            <th scope="col">Nombre</th>
-            <th scope="col">Username</th>
-            <th scope="col">Contraseña</th>
-            <th scope="col">Email</th>
-            <th scope="col">Rol</th>
-            <th scope="col">Acciones</th>
-          </tr>
-        </thead>
-        <tbody>
-          {items.map((item) => (
-            <tr key={item._id}>
-              <td>{item.nombre}</td>
-              <td>{item.username}</td>
-              <td>{item.contraseña}</td>
-              <td>{item.email}</td>
-              <td>{item.rol}</td>
-              <td>
-                <button
-                  type="button"
-                  className="btn btn-primary btn-sm me-2"
-                  onClick={() => handleEdit(item._id)}
-                >
-                  Editar
-                </button>
-                <button
-                  type="button"
-                  className="btn btn-danger btn-sm"
-                  onClick={() => handleDelete(item._id, item.nombre)}
-                >
-                  Eliminar
-                </button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
     </div>
   );
 };
 
-export default CrudUser;
+export default CrudUsarios;

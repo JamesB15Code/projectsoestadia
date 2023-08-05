@@ -3,7 +3,6 @@ import { AuthContext } from "../Auth/AuthProvider";
 import { Card } from "react-bootstrap";
 import { motion } from "framer-motion";
 import { show_alerta } from "../funtions";
-import { URL_PRODUCT } from "../Url";
 import axios from "axios";
 import "../Css/prodPreview.css";
 
@@ -13,6 +12,7 @@ const ProdPreview = () => {
   const { isAuthenticated, user } = useContext(AuthContext);
   const [showModal, setShowModal] = useState(false);
   const [modalData, setModalData] = useState({});
+  const URL_PRODUCT = "http://localhost/proyectoApi/apiProducto.php";
 
   useEffect(() => {
     getProducts();

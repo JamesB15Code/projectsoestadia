@@ -1,11 +1,11 @@
 import React from 'react'
-import CrudFooter from '../Components/crudFooter'
+import CrudEmpresa from '../Components/crudEmpresa'
 import Admin from '../Components/navbar2'
-export default function crudFooter() {
+export default function crudEmpresa() {
   return (
     <div>
       <Admin/>
-      <CrudFooter/>
+      <CrudEmpresa/>
     </div>
   )
 }

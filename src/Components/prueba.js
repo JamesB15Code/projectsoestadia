@@ -1,418 +1,217 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faHouse,
+  faEye,
+  faEyeSlash,
+} from "@fortawesome/free-solid-svg-icons";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import Swal from "sweetalert2";
-import withReactContent from "sweetalert2-react-content";
-import { show_alerta } from "../funtions";
 
-const CrudUser = () => {
-  const url = "http://localhost/proyectoApi/apiUsuario.php";
-  const [users, setUsers] = useState([]);
-  const [idU, setId] = useState("");
-  const [opcion, setOpcion] = useState("");
-  const [titulo, setTitulo] = useState("");
-
+export default function Registro() {
+  const URL_USER = "http://localhost/proyectoApi/apiUsuario.php"; // Reemplaza con la URL de tu API de registro
   const [nombre, setNombre] = useState("");
-  const [username, setUsername] = useState("");
-  const [contraseña, setContraseña] = useState("");
-  const [correo, setCorreo] = useState("");
+  const [username, setUser] = useState("");
+  const [email, setEmail] = useState("");
+  const [pass, setPass] = useState("");
   const [pregunta, setPregunta] = useState("");
   const [respuesta, setRespuesta] = useState("");
-  const [rol, setRol] = useState("");
-
   const [showPassword, setShowPassword] = useState(false);
-  const [showModal, setShowModal] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const histori = useNavigate();
 
-  useEffect(() => {
-    getUser();
-  }, []);
-
-  const getUser = async () => {
-    try {
-      const res = await axios.get(url);
-      setUsers(res.data);
-    } catch (error) {
-      show_alerta("Error al obtener los usuarios", "error");
-      console.log(error);
+  const handleSubmit = async (target) => {
+    target.preventDefault();
+    if (!nombre || !username || !email || !pass) {
+      setErrorMessage("Todos los campos son obligatorios");
+      return;
     }
-  };
-
-  const openModal = (
-    op,
-    idUsuarios,
-    nombre,
-    username,
-    contraseña,
-    correo,
-    pregunta,
-    respuesta,
-    rol
-  ) => {
-    setId("");
-    setNombre("");
-    setUsername("");
-    setContraseña("");
-    setCorreo("");
-    setPregunta("");
-    setRespuesta("");
-    setRol("");
-    setOpcion(op);
-    if (op === 1) {
-      setTitulo("Registrar");
-    } else if (op === 2) {
-      setTitulo("Editar");
-      setId(idUsuarios);
-      setNombre(nombre);
-      setUsername(username);
-      setContraseña(contraseña);
-      setCorreo(correo);
-      setPregunta(pregunta);
-      setRespuesta(respuesta);
-      setRol(rol);
-      console.log("ID:", idUsuarios);
+    if (!/^[a-zA-Z]+$/.test(nombre)) {
+      setErrorMessage("El nombre solo debe tener letras");
+      return;
     }
-
-    setShowModal(true);
-    window.setTimeout(function () {
-      document.getElementById("nombre").focus();
-    }, 500);
-  };
-
-  const validar = () => {
-    if (
-      !nombre ||
-      !contraseña ||
-      !correo ||
-      !username ||
-      !pregunta ||
-      !respuesta
-    ) {
-      show_alerta("Completa todos los campos", "warning");
+    if (!/\S+@\S+\.\S+/.test(email)) {
+      setErrorMessage("Ingresa un correo electrónico válido");
+      return;
+    }
+    if (!/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/.test(pass)) {
+      setErrorMessage(
+        "La contraseña debe tener al menos 8 caracteres, una letra mayúscula, una letra minúscula y un número para ser aceptada"
+      );
       return;
     }
 
-    const parametros = {
-      nombre: nombre,
-      username: username,
-      contraseña: contraseña,
-      correo: correo,
-      pregunta: pregunta,
-      respuesta: respuesta,
-      idRol: rol,
-    };
-    console.log("Parámetros:", parametros, "ID:", idU);
-
-    if (opcion === 1) {
-      guardar(parametros);
-    } else if (opcion === 2) {
-      editar(parametros, idU);
-    }
-  };
-
-  const guardar = async (parametros) => {
     try {
-      await axios.post(url, parametros);
-      show_alerta("Guardado", "success");
-      document.getElementById("btncerrar").click();
-      getUser();
-    } catch (error) {
-      show_alerta("Error al guardar " + error.messagge + " error");
-      console.log(error);
-    }
-  };
-
-  const editar = async (parametros, idUsuarios) => {
-    try {
-      const editUrl = `${url}/${idUsuarios}`;
-      console.log("URL:", editUrl);
-      await axios.put(editUrl, parametros);
-      show_alerta("Actualizado", "success");
-      document.getElementById("btncerrar").click();
-      getUser();
-    } catch (error) {
-      show_alerta("Error al editar", "error");
-      console.log(error);
-    }
-  };
-
-  const eliminar = (idUsuarios, nombre) => {
-    const MySwal = withReactContent(Swal);
-    MySwal.fire({
-      title: `¿Desea eliminar a ${nombre}?`,
-      icon: "question",
-      showCancelButton: true,
-      confirmButtonText: "Eliminar",
-      cancelButtonText: "Cancelar",
-    }).then(async (result) => {
-      if (result.isConfirmed) {
-        try {
-          await axios.delete(`${url}?idUsuarios=${idUsuarios}`);
-          show_alerta("Se eliminó correctamente", "success");
-          getUser();
-        } catch (error) {
-          if (error.response) {
-            show_alerta(
-              `Error ${error.response.status}: ${error.response.data}`,
-              "error"
-            );
-          } else if (error.request) {
-            show_alerta("Error de solicitud", "error");
-          } else {
-            show_alerta("Error al eliminar el usuario", "error");
-          }
-          console.log(error);
-        }
-      } else {
-        show_alerta("No se eliminó", "info");
+      const users = await axios.get(URL_USER);
+      if (users.data.find((u) => u.username === username || u.correo === email)) {
+        setErrorMessage("El usuario o correo ya existe");
+        return;
       }
-    });
+
+      const response = await axios.post(URL_USER, {
+        nombre: nombre,
+        username: username,
+        contraseña: pass,
+        correo: email,
+        pregunta: pregunta,
+        respuesta: respuesta,
+      });
+      console.log(response.data);
+      setNombre("");
+      setUser("");
+      setEmail("");
+      setPass("");
+      setPregunta("");
+      setRespuesta("");
+      setErrorMessage("");
+      histori("/login");
+    } catch (error) {
+      console.error(error);
+      setErrorMessage("Hubo un error al registrar");
+    }
   };
+
+  const handleLogout = () => {
+    histori("/");
+  };
+
+  // Si el usuario ha sido registrado, redirigirlo a la página de inicio de sesión
 
   return (
-    <div className="App">
-      <div className="container">
-        <div className="row mt-5 mb-4">
-          <div className="col-md-3 offset-md-2">
-            <div className="d-grid mx-auto">
-              <button className="btn btn-info" onClick={() => openModal(1)}>
-                Agregar
-              </button>
-            </div>
-          </div>
-        </div>
-        <table className="table ">
-          <thead>
-            <tr>
-              <th scope="col">ID</th>
-              <th scope="col">Nombre</th>
-              <th scope="col">Username</th>
-              <th scope="col">Contraseña</th>
-              <th scope="col">Correo</th>
-              <th scope="col">Pregunta</th>
-              <th scope="col">Respuesta</th>
-              <th scope="col">Rol</th>
-              <th scope="col">Acciones</th>
-            </tr>
-          </thead>
-          <tbody className="table-group-divider">
-            {users.map(
-              (
-                {
-                  idUsuarios,
-                  nombre,
-                  username,
-                  contraseña,
-                  correo,
-                  pregunta,
-                  respuesta,
-                  rol,
-                },
-                index
-              ) => (
-                <tr key={idUsuarios}>
-                  <td>{index + 1}</td>
-                  <td>{nombre}</td>
-                  <td>{username}</td>
-                  <td>{contraseña}</td>
-                  <td>{correo}</td>
-                  <td>{pregunta}</td>
-                  <td>{respuesta}</td>
-                  <td>{rol}</td>
-                  <td>
-                    <button
-                      type="button"
-                      className="btn btn-primary btn-sm me-2"
-                      onClick={() =>
-                        openModal(
-                          2,
-                          idUsuarios,
-                          nombre,
-                          username,
-                          contraseña,
-                          correo,
-                          pregunta,
-                          respuesta,
-                          rol
-                        )
-                      }
-                    >
-                      Editar
-                    </button>
-                    <button
-                      type="button"
-                      className="btn btn-danger btn-sm"
-                      onClick={() => eliminar(idUsuarios, nombre)}
-                    >
-                      Eliminar
-                    </button>
-                  </td>
-                </tr>
-              )
-            )}
-          </tbody>
-        </table>
-      </div>
-
-      <div
-        id="modalUser"
-        className={`modal fade ${showModal ? "show" : ""}`}
-        style={{ display: showModal ? "block" : "none" }}
-        aria-modal="true"
-      >
-        <div className="modal-dialog">
-          <div className="modal-content">
-            <div className="modal-header">
-              <label className="h5">{titulo}</label>
-              <button
-                type="button"
-                className="btn-close"
-                data-bs-dismiss="modal"
-                aria-label="Close"
-                onClick={() => setShowModal(false)}
-              ></button>
-            </div>
-            <div className="modal-body">
-              <div className="row mb-3 ">
-                <div className="col">
-                  <label className="form-label">Nombre</label>
-                  <input
-                    id="nombre"
-                    type="text"
-                    value={nombre}
-                    onChange={(e) => setNombre(e.target.value)}
-                    className="form-control"
-                    placeholder="nombre"
-                    name="Nombre"
-                    required
-                  />
+    <div>
+      <main className="container ">
+        <div className="row justify-content-center mt-4">
+          <div className="col-lg-5 mb-2">
+            <div className="">
+              <div className="card shadow p-3 ">
+                <div className="text-center">
+                  <h1 className="text-primary fs-4 mb-2">Registrate</h1>
                 </div>
-
-                <div className="col">
-                  <label className="form-label">Nombre usuario</label>
-                  <input
-                    type="text"
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
-                    className="form-control"
-                    placeholder="Nombre usuario"
-                    required
-                  />
-                </div>
-              </div>
-              <div className="row mb-3">
-                <div className="col">
-                  <label className="form-label">Correo</label>
-                  <input
-                    id="correo"
-                    type="email"
-                    value={correo}
-                    onChange={(e) => setCorreo(e.target.value)}
-                    className="form-control"
-                    placeholder="Correo"
-                  />
-                </div>
-              </div>
-
-              <div className="row mb-3">
-                <div className="col">
-                  <label className="form-label">Pregunta</label>
-                  <div className="input-group">
-                    <select
-                      id="pregunta"
-                      value={pregunta}
-                      onChange={(e) => setPregunta(e.target.value)}
-                      className="form-select"
-                      required
-                    >
-                      <option value="" disabled hidden>
-                        Selecciona una pregunta
-                      </option>
-                      <option value="mascota">
-                        ¿Cuál es tu mascota favorito?
-                      </option>
-                      <option value="color">¿Cuál es tu color favorito?</option>
-                      <option value="comida">
-                        ¿Cuál es tu comida favorita?
-                      </option>
-                    </select>
-                    <div className="input-group-append"></div>
-                  </div>
-                </div>
-                <div className="col">
-                  <label className="form-label">Respuesta</label>
-                  <input
-                    type="text"
-                    value={respuesta}
-                    onChange={(e) => setRespuesta(e.target.value)}
-                    className="form-control"
-                    placeholder="Respuesta"
-                  />
-                </div>
-              </div>
-              <div className="row mb-4">
-                <div className="col">
-                  <label htmlFor="rol" className="form-label">
-                    Selecciona rol
+                {errorMessage !== "" && (
+                  <label className="text-danger text-center fs-5">
+                    {errorMessage}
                   </label>
-                  <div className="input-group">
-                    <select
-                      id="rol"
-                      value={rol}
-                      onChange={(e) => setRol(e.target.value)}
-                      className="form-select"
-                      required
-                    >
-                      <option value="" disabled hidden>
-                        Selecciona un rol
-                      </option>
-                      <option value="1">Usuario</option>
-                      <option value="2">Admin</option>
-                    </select>
-                    <div className="input-group-append">
-                    </div>
-                  </div>
-                </div>
-
-                <div className="col">
-                  <label className="form-label">Contraseña</label>
-                  <div className="input-group">
+                )}
+                <form onSubmit={handleSubmit}>
+                  <div className="">
+                    <label className="form-label text-primary fs-5 mb-1 ms-3">
+                      Nombre
+                    </label>
                     <input
-                      type={showPassword ? "text" : "password"}
-                      value={contraseña}
-                      onChange={(e) => setContraseña(e.target.value)}
-                      className="form-control"
-                      placeholder="Contraseña"
+                      className="form-control text-secondary rounded-5 "
+                      type='text'
+                      value={nombre}
+                      name='Nombre'
+                      placeholder="Introduce tu nombre"
+                      onChange={(target) => setNombre(target.value)}
+                    />
+                  </div>
+                  <div className="">
+                    <label className="form-label text-primary fs-5 mb-1 ms-3">
+                      Usuario
+                    </label>
+                    <input
+                      className="form-control text-secondary rounded-5"
+                      type='text'
+                      value={username}
+                      name='Usuario'
+                      placeholder='Introduce tu usuario'
+                      onChange={(target) => setUser(target.value)}
+                    />
+                  </div>
+                  <div className="">
+                    <label className="form-label text-primary fs-5 mb-1 ms-3">
+                      Correo Electronico
+                    </label>
+                    <input
+                      className="form-control text-secondary rounded-5"
+                      type='email'
+                      value={email}
+                      name='Email'
+                      placeholder='Introduce tu correo'
+                      onChange={(target) => setEmail(target.value)}
+                    />
+                    <label className="form-label text-primary fs-5 mb-1 ms-3">
+                      Contraseña
+                    </label>
+                  </div>
+                  <div className="input-group mb-3 ">
+                    <input
+                      className="form-control text-secondary "
+                      type={showPassword ? 'text' : 'password'}
+                      value={pass}
+                      name='Password'
+                      placeholder='Introduce tu contraseña'
+                      onChange={(target) => setPass(target.value)}
                     />
                     <button
                       type="button"
-                      className="btn btn-outline-primary"
+                      className="btn btn-outline-secondary"
                       onClick={() => setShowPassword(!showPassword)}
                     >
-                      {showPassword ? "Ocultar" : "Mostrar"}
+                      {showPassword ? (
+                        <FontAwesomeIcon icon={faEyeSlash} />
+                      ) : (
+                        <FontAwesomeIcon icon={faEye} />
+                      )}
                     </button>
                   </div>
-                </div>
+                  <div className="input-group mb-3">
+                    <select
+                      className="form-control text-secondary rounded-5"
+                      id="pregunta"
+                      onChange={(target) => setPregunta(target.value)}
+                    >
+                      <option value="">selecciona una pregunta</option>
+                      <option value="¿Cúal es tu color favorito?">
+                        ¿Cúal es tu color favorito?
+                      </option>
+                      <option value="¿cúal es tu comida favorita?">
+                        ¿cúal es tu comida favorita?
+                      </option>
+                      <option value="¿cúal es tu comida favorita?">
+                        ¿El nombre de tu mascosta?
+                      </option>
+                    </select>
+                  </div>
+                  <div className="input-group mb-3">
+                    <input
+                      className="form-control text-secondary rounded-5"
+                      type='text'
+                      value={respuesta}
+                      placeholder='Respuesta'
+                      onChange={(target) => setRespuesta(target.value)}
+                    />
+                  </div>
+                  <div className="row justify-content-evenly">
+                    <div className="text-center ">
+                      <button
+                        className="btn btn-primary  rounded-5"
+                        type="submit"
+                      >
+                        Registrar
+                      </button>
+                    </div>
+                    <div className="text-center mt-2">
+                      <a className="fs-5  text-decoration-none" href="login">
+                        iniciar sesión
+                      </a>
+                    </div>
+                  </div>
+                </form>
               </div>
-              <div className="d-grid col-6 mx-auto">
-                <button className="btn btn-success" onClick={validar}>
-                  Guardar
-                </button>
-              </div>
-            </div>
-            <div className="modal-footer">
-              <button
-                className="btn btn-secondary"
-                type="button"
-                data-bs-dismiss="modal"
-                id="btncerrar"
-                onClick={() => setShowModal(false)}
-              >
-                Cerrar
-              </button>
             </div>
           </div>
+          <div className="">
+            <button
+              className="btn btn-primary fs-5 float-start"
+              onClick={handleLogout}
+            >
+              <FontAwesomeIcon icon={faHouse} />
+            </button>
+          </div>
         </div>
-      </div>
+      </main>
     </div>
   );
-};
-export default CrudUser;
+}

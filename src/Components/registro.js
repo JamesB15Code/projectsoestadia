@@ -1,196 +1,206 @@
 import React, { useState } from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faHouse,
+  faEye,
+  faEyeSlash,
+} from "@fortawesome/free-solid-svg-icons";
 import { useNavigate } from "react-router-dom";
-import zxcvbn from "zxcvbn"; // Importa la biblioteca zxcvbn para la validación de contraseñas
+import axios from "axios";
 
 export default function Registro() {
-  const url = "http://localhost/proyectoApi/apiUsuario.php"; //aqui va tu api
-  const navigate = useNavigate();
+  const URL_USER = "http://localhost/proyectoApi/apiUsuario.php"; // Reemplaza con la URL de tu API de registro
   const [nombre, setNombre] = useState("");
-  const [username, setNameUser] = useState("");
+  const [user, setUser] = useState("");
   const [email, setEmail] = useState("");
-  const [contraseña, setContraseña] = useState("");
-  const [contraseña2, setContraseña2] = useState("");
-  const [errorMessage, setErrorMessage] = useState("");
-
+  const [pass, setPass] = useState("");
+  const [pregunta, setPregunta] = useState("");
+  const [respuesta, setRespuesta] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const histori = useNavigate();
 
-  const togglePasswordVisibility = () => {
-    setShowPassword(!showPassword);
-  };
-
-  const handleRegistro = (e) => {
+  const RegistroUsuario = async (e) => {
     e.preventDefault();
-    if (!zxcvbn(contraseña).score >= 2) {
-      setErrorMessage(
-        "La contraseña debe ser más fuerte. Asegúrate de que tenga al menos 8 caracteres y contenga letras mayúsculas, minúsculas, números y símbolos."
-      );
-      return;
-    }
-    if (contraseña !== contraseña2) {
-      setErrorMessage("Las contraseñas no coinciden");
-      return;
-    }
-    // Validar el correo electrónico
-    if (!/\S+@\S+\.\S+/.test(email)) {
-      setErrorMessage("Ingresa un correo electrónico válido");
+    if (!nombre || !user || !email || !pass) {
+      setErrorMessage("Todos los campos son obligatorios");
       return;
     }
     if (!/^[a-zA-Z]+$/.test(nombre)) {
       setErrorMessage("El nombre solo debe tener letras");
       return;
-    } else {
-      fetch(url)
-        .then((response) => response.json())
-        .then((data) => {
-          const userr = data.find(
-            (u) => u.email === email && u.username === username
-          );
-          if (userr) {
-            setErrorMessage("El usuario o correo ya existen");
-          } else {
-            fetch(url, {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({
-                nombre: nombre,
-                username: username,
-                contraseña: contraseña,
-                email: email,
-              }),
-            })
-              .then((response) => response.json())
-              .then((data) => {
-                navigate("/login");
-              })
-              .catch((error) => {
-                console.error(error);
-                setErrorMessage("Hubo un error al registrar");
-              });
-          }
-        });
+    }
+    if (!/\S+@\S+\.\S+/.test(email)) {
+      setErrorMessage("Ingresa un correo electrónico válido");
+      return;
+    }
+    if (!/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/.test(pass)) {
+      setErrorMessage(
+        "La contraseña debe tener al menos 8 caracteres, una letra mayúscula, una letra minúscula y un número para ser aceptada"
+      );
+      return;
+    }
+
+    try {
+      const users = await axios.get(URL_USER);
+      if (users.data.find((u) => u.username === user || u.correo === email)) {
+        setErrorMessage("El usuario o correo ya existe");
+        return;
+      }
+
+      const response = await axios.post(URL_USER, {
+        nombre: nombre,
+        username: user,
+        contraseña: pass,
+        correo: email,
+        pregunta: pregunta,
+        respuesta: respuesta,
+      });
+      console.log(response.data);
+      setNombre("");
+      setUser("");
+      setEmail("");
+      setPass("");
+      setPregunta("");
+      setRespuesta("");
+      setErrorMessage("");
+      histori("/login");
+    } catch (error) {
+      console.error(error);
+      setErrorMessage("Hubo un error al registrar");
     }
   };
 
+  const handleLogout = () => {
+    histori("/");
+  };
+
+  // Si el usuario ha sido registrado, redirigirlo a la página de inicio de sesión
+
   return (
     <div>
-      <main id="main" className="d-flex w-100 mt-5 mb-3 ">
-        <div className="container d-flex flex-column mt-5">
-          <div className="row mt-5 ">
-            <div className="col-lg-5 mx-auto d-table h-100 ">
-              <div className="d-table-cell align-middle">
-                <div className="card card-login rounded-5 bg-light  ">
-                  <div className="card-body">
-                    <div className="text-center text-primary mb-1">
-                      <h1 className="fs-4 ">Registrate</h1>
-                      <hr />
-                    </div>
-                    {errorMessage !== "" && (
-                      <label className=" text-center">{errorMessage}</label>
-                    )}
-                    <form onSubmit={handleRegistro}>
-                      <div className="">
-                        <label className="form-label fs-5 text-primary ms-3">
-                          Nombre
-                        </label>
-                        <input
-                          className="form-control fs-6 form-control-lg input-login  text-black rounded-5"
-                          type="text"
-                          name="inp_usario"
-                          required
-                          onChange={(e) => setNombre(e.target.value)}
-                          placeholder="Introduce tu nombre"
-                        />
-                      </div>
-                      <div className="">
-                        <label className="form-label fs-5 text-primary ms-3">
-                          Usuario
-                        </label>
-                        <input
-                          className="form-control fs-6 form-control-lg input-login  text-black rounded-5"
-                          type="text"
-                          name="inp_usario"
-                          required
-                          onChange={(e) => setNameUser(e.target.value)}
-                          placeholder="Introduce tu usuario"
-                        />
-                      </div>
-                      <div className="">
-                        <label className="form-label fs-5 text-primary ms-3">
-                          Correo electrónico
-                        </label>
-                        <input
-                          className="form-control fs-6 form-control-lg input-login  text-black rounded-5"
-                          type="email"
-                          name="inp_email"
-                          onChange={(e) => setEmail(e.target.value)}
-                          placeholder="Introduce tu correo electrónico"
-                          required
-                        />
-                      </div>
-                      <div className="">
-                        <label
-                          htmlFor="password"
-                          className="form-label fs-5 text-primary ms-3"
-                        >
-                          Contraseña
-                        </label>
-                        <div className="input-group">
-                          <input
-                            id="password"
-                            className="form-control fs-6 form-control-lg input-login rounded-5"
-                            type={showPassword ? "text" : "password"}
-                            value={contraseña}
-                            onChange={(e) => setContraseña(e.target.value)}
-                            placeholder="Ingresa tu contraseña"
-                            required
-                          />
-                        </div>
-                      </div>
-
-                      <div className="">
-                        <div>
-                          <label className="form-label fs-5 text-primary ms-3">
-                            Verificar contraseña
-                          </label>
-                        </div>
-                        <div>
-                          <input
-                            className="form-control fs-6 form-control-lg input-login  text-black rounded-5"
-                            type={showPassword ? "text" : "password"}
-                            value={contraseña2}
-                            name="inp_verf_password"
-                            onChange={(e) => setContraseña2(e.target.value)}
-                            placeholder=" Verificar tu contraseña"
-                            id="pass2"
-                            required
-                          />
-                        </div>
-                      </div>
-                      <div className="d-flex justify-content-end">
-                        <button
-                          type="button"
-                          className="btn mt-2 btn-primary rounded-5"
-                          onClick={togglePasswordVisibility}
-                        >
-                          {showPassword ? "Ocultar" : "Mostrar"}
-                        </button>
-                      </div>
-
-                      <div className="text-center mt-2">
-                        <button
-                          type="submit"
-                          className="btn text-primary fs-4 btn-sm  rounded-5"
-                        >
-                          Crear cuenta
-                        </button>
-                      </div>
-                    </form>
-                  </div>
+      <main className="container ">
+        <div className="row justify-content-center mt-4">
+          <div className="col-lg-5 mb-2">
+            <div className="">
+              <div class="card shadow p-3 ">
+                <div className="text-center">
+                  <h1 className="text-primary fs-4 mb-2">Registrate</h1>
                 </div>
+                {errorMessage !== "" && (
+                  <label className="text-danger text-center fs-5">
+                    {errorMessage}
+                  </label>
+                )}
+                <form onSubmit={RegistroUsuario}>
+                  <div className="">
+                    <label className="form-label text-primary fs-5 mb-1 ms-3">
+                      Nombre
+                    </label>
+                    <input
+                      className="form-control text-secondary rounded-5 "
+                      type="text"
+                      name="inp_usario"
+                      placeholder="Introduce tu nombre"
+                      onChange={(e) => setNombre(e.target.value)}
+                    />
+                  </div>
+                  <div className="">
+                    <label className="form-label text-primary fs-5 mb-1 ms-3">
+                      Usuario
+                    </label>
+                    <input
+                      className="form-control text-secondary rounded-5"
+                      type="text"
+                      name="inp_usario"
+                      placeholder="Introduce tu usuario"
+                      onChange={(e) => setUser(e.target.value)}
+                    />
+                  </div>
+                  <div className="">
+                    <label className="form-label text-primary fs-5 mb-1 ms-3">
+                      Correo Electronico
+                    </label>
+                    <input
+                      className="form-control text-secondary rounded-5"
+                      type="email"
+                      name="inp_email"
+                      placeholder="Introduce tu correo"
+                      onChange={(e) => setEmail(e.target.value)}
+                    />
+                    <label className="form-label text-primary fs-5 mb-1 ms-3">
+                      Contraseña
+                    </label>
+                  </div>
+                  <div className="input-group mb-3 ">
+                    <input
+                      className="form-control text-secondary "
+                      type={showPassword ? "text" : "password"}
+                      name="inp_password"
+                      placeholder="Introduce tu contraseña"
+                      onChange={(e) => setPass(e.target.value)}
+                    />
+                    <button
+                      type="button"
+                      className="btn btn-outline-secondary"
+                      onClick={() => setShowPassword(!showPassword)}
+                    >
+                      {showPassword ? (
+                        <FontAwesomeIcon icon={faEyeSlash} />
+                      ) : (
+                        <FontAwesomeIcon icon={faEye} />
+                      )}
+                    </button>
+                  </div>
+                  <div className="input-group mb-3">
+                    <select
+                      className="form-control text-secondary rounded-5"
+                      id="pregunta"
+                      onChange={(e) => setPregunta(e.target.value)}
+                    >
+                      <option value="">selecciona una pregunta</option>
+                      <option value="¿Cúal es tu color favorito?">
+                        ¿Cúal es tu color favorito?
+                      </option>
+                      <option value="¿cúal es tu comida favorita?">
+                        ¿cúal es tu comida favorita?
+                      </option>
+                    </select>
+                  </div>
+                  <div className="input-group mb-3">
+                    <input
+                      type="text"
+                      className="form-control text-secondary rounded-5"
+                      placeholder="Respuesta"
+                      onChange={(e) => setRespuesta(e.target.value)}
+                    />
+                  </div>
+                  <div className="row justify-content-evenly">
+                    <div className="text-center ">
+                      <button
+                        className="btn btn-primary  rounded-5"
+                        type="submit"
+                      >
+                        Registrar
+                      </button>
+                    </div>
+                    <div className="text-center mt-2">
+                      <a className="fs-5  text-decoration-none" href="login">
+                        iniciar sesión
+                      </a>
+                    </div>
+                  </div>
+                </form>
               </div>
             </div>
+          </div>
+          <div className="">
+            <button
+              className="btn btn-primary fs-5 float-start"
+              onClick={handleLogout}
+            >
+              <FontAwesomeIcon icon={faHouse} />
+            </button>
           </div>
         </div>
       </main>

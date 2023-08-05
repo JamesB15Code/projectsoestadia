@@ -1,22 +1,26 @@
-
 import { BrowserRouter , Routes,Route } from "react-router-dom";
-import "./App.css";
 
 //importamos los componentes creados
 import { AuthContextProvider } from './Auth/AuthProvider';
 import Home from "./Views/inicio";
 import login from "./Views/login";
 import registro from "./Views/resgistro";
-import smart from "./Views/smart";
-import showphones from "./Views/showphones";
 import prueba from "./Views/prueba";
-import crudPhones from "./Views/crudPhones";
+import crudProducts from "./Views/crudProducts";
 import crudUsers from "./Views/crudUsers";
-import CrudFooter from "./Views/crudFooter";
+import crudEmpresa from "./Views/crudEmpresa";
+import crudSlider from "./Views/crudSlider";
 import crudLogos from "./Views/crudLogos"
-import pruebas from "./Views/pruebas"
-import admin from "./Views/admin"
+import recuperarPass from "./Views/recuperacionPass";
 
+import admin from "./Views/admin"
+import perfilUser from "./Views/perfilUser"
+import perfilAdmin from "./Views/perfilAdmin"
+
+import ordenesCompra from "./Views/ordenesCompra";
+import ordenesCompraAdmin from "./Views/ordenesCompraAdmin";
+import showphones from "./Views/showphones";
+import showtablets from "./Views/showTablets"
 
 function App() {
   return (
@@ -25,19 +29,26 @@ function App() {
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<Home />} />
-            <Route path='/login' Component={login}></Route>
-            <Route path='/registro' Component={registro}></Route>
-            <Route path='/smartphone' Component={smart}></Route>
-            <Route path='/showphones' Component={showphones}></Route>
-            <Route path='/crudPhones' Component={crudPhones}></Route>
-            <Route path='/crudUsers' Component={crudUsers}></Route>
-            <Route path='/crudFooter' Component={CrudFooter}></Route>
-            <Route path='/crudLogos' Component={crudLogos}></Route>
+            <Route path='/login' Component={login}/>
+            <Route path='/registro' Component={registro}/>
+            <Route path='/showphones' Component={showphones}/>
+            <Route path='/showtablets' Component={showtablets}/>
 
-            <Route path='/admin' Component={admin}></Route>
+            <Route path='/crudProducts' Component={crudProducts}/>
+            <Route path='/crudUsers' Component={crudUsers}/>
+            <Route path='/crudEmpresa' Component={crudEmpresa}/>
+            <Route path='/crudLogos' Component={crudLogos}/>
+            <Route path='/crudSlider' Component={crudSlider}/>
 
-            <Route path='/pruebas' Component={pruebas}></Route>
-            <Route path='/prueba' Component={prueba}></Route>
+            <Route path='/admin' Component={admin}/>
+            <Route path='/perfilUser' Component={perfilUser}/>
+            <Route path='/perfilAdmin' Component={perfilAdmin}/>
+            <Route path='/recuperarPass' Component={recuperarPass}/>
+
+            <Route path='/ordenesCompra' Component={ordenesCompra}/>
+            <Route path='/ordenesCompraAdmin' Component={ordenesCompraAdmin}/>
+            
+            <Route path='/prueba' Component={prueba}/>
           </Routes>
         </BrowserRouter>
       </AuthContextProvider>

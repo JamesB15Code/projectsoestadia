@@ -1,14 +1,14 @@
 import React from "react";
 import Navbarr from "../Components/navbar";
 import Footer from "../Components/footerr";
-import Showphones from "../Components/showphones";
+import Showtablets from "../Components/showTablets";
 
-export default function showphones() {
+export default function showTablets() {
   return (
     <div>
       <Navbarr /> 
       <br/>
-      <Showphones/>
+      <Showtablets/>
       <Footer />
     </div>
   );
