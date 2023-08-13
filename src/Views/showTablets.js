@@ -9,6 +9,7 @@ export default function showTablets() {
       <Navbarr /> 
       <br/>
       <Showtablets/>
+      <br/>
       <Footer />
     </div>
   );

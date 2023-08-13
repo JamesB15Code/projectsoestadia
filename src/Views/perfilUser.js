@@ -10,7 +10,7 @@ export default function PerfilUser() {
       <Navbar/>
       <br/>
       <Perfil/>
-      <Fotter/>
+      
     </div>
   )
 }

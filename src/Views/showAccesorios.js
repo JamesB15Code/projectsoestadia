@@ -1,14 +1,14 @@
 import React from "react";
 import Navbarr from "../Components/navbar";
 import Footer from "../Components/footerr";
-import Showphones from "../Components/showphones";
+import ShowAcesorios from "../Components/showAccesorios";
 
-export default function showphones() {
+export default function showAcesorios() {
   return (
     <div>
       <Navbarr /> 
       <br/>
-      <Showphones/>
+      <ShowAcesorios/>
       <br/>
       <Footer />
     </div>

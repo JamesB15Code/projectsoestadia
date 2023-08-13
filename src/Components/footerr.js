@@ -168,7 +168,7 @@ function Footer() {
           {showModal && (
             <div className="modal" style={{ display: "block" }}>
               <div
-                className="modal-dialog modal-dialog-centered
+                className="modal-dialog modal-dialog-centered modal-lg
               "
               >
                 <div className="modal-content">

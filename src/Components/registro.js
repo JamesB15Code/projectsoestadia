@@ -22,7 +22,7 @@ export default function Registro() {
 
   const RegistroUsuario = async (e) => {
     e.preventDefault();
-    if (!nombre || !user || !email || !pass) {
+    if (!nombre || !user || !email || !pass || !pregunta || !respuesta ) {
       setErrorMessage("Todos los campos son obligatorios");
       return;
     }
@@ -83,7 +83,7 @@ export default function Registro() {
         <div className="row justify-content-center mt-4">
           <div className="col-lg-5 mb-2">
             <div className="">
-              <div class="card shadow p-3 ">
+              <div className="card shadow p-3 ">
                 <div className="text-center">
                   <h1 className="text-primary fs-4 mb-2">Registrate</h1>
                 </div>
@@ -162,8 +162,11 @@ export default function Registro() {
                       <option value="¿Cúal es tu color favorito?">
                         ¿Cúal es tu color favorito?
                       </option>
+                      <option value="¿Cúal es tu comida favorita?">
+                        ¿Cúal es tu comida favorita?
+                      </option>
                       <option value="¿cúal es tu comida favorita?">
-                        ¿cúal es tu comida favorita?
+                        ¿Cúal es el nombre de tu mascota?
                       </option>
                     </select>
                   </div>

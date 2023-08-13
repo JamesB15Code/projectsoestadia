@@ -31,7 +31,7 @@ const ProductManagement = () => {
   const getInfoEmpresa = async () => {
     try {
       const response = await axios.get(URL_INFEMPRESA);
-      console.log(response.data);
+      //console.log(response.data);
       setEmpresa(response.data);
     } catch (error) {
       show_alerta("Error al obtener productos", "error");
@@ -235,7 +235,7 @@ const ProductManagement = () => {
               </div>
               <div className="col">
                 <label className="form-label">Sobre nosotros</label>
-                <input
+                <textarea
                   type="text"
                   className="form-control"
                   value={sobreNosotros}
@@ -244,7 +244,7 @@ const ProductManagement = () => {
               </div>
               <div className="col">
                 <label className="form-label">Aviso de privacidad</label>
-                <input
+                <textarea
                   type="text"
                   className="form-control"
                   value={avisoPrivacidad}
@@ -253,7 +253,7 @@ const ProductManagement = () => {
               </div>
               <div className="col">
                 <label className="form-label">Dirección</label>
-                <input
+                <textarea
                   type="text"
                   className="form-control"
                   value={direccion}
@@ -280,7 +280,7 @@ const ProductManagement = () => {
             </div>
             <div className="col">
               <label className="form-label">Horario</label>
-              <input
+              <textarea
                 type="text"
                 className="form-control"
                 value={horario}

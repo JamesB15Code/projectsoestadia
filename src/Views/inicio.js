@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import Navbarr from '../Components/navbar';
-import NavbarAdmin from '../Components/navbar2';
 import ProdPreview from '../Components/prodPreview';
 import CarouselFadeExample from '../Components/slider';
 import Footer from '../Components/footerr';
@@ -30,17 +29,7 @@ class Home extends Component{
          </div>
          </div>)
         }
-
-   /* return(
-        <div id='home'>
-            <div>
-                <Navbarr/>
-                <CarouselFadeExample/>
-                <ProdPreview/>
-                <Footer/>
-            </div>
-        </div>
-    )  */    
+  
   }
 }
 

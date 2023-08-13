@@ -15,6 +15,7 @@ export const AuthContextProvider = ({ children }) => {
     localStorage.setItem('pregunta', user.pregunta);
     localStorage.setItem('respuesta', user.respuesta);
     localStorage.setItem('rol', user.rol);
+    localStorage.setItem('idUsuario', user.idUsuarios);
     setIsAuthenticated(true);
   };
 
@@ -43,6 +44,7 @@ export const AuthContextProvider = ({ children }) => {
     localStorage.removeItem('pregunta');
     localStorage.removeItem('respuesta');
     localStorage.removeItem('rol');
+    localStorage.removeItem('idUsuario');
     setIsAuthenticated(false);
     setUser(null);
   };

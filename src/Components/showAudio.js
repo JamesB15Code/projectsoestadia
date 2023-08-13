@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { show_alerta } from "../funtions";
 import { AuthContext } from "../Auth/AuthProvider";
 
+
 import "../Css/prodPreview.css";
 
 function HomeScreen() {
@@ -124,7 +125,7 @@ function HomeScreen() {
       (marcaLC.includes(searchTermLC) ||
       modeloLC.includes(searchTermLC) ||
       colorLC.includes(searchTermLC)) &&
-      product.categoria === "Smartphone"
+      product.categoria === "Audio"
     );
   });
 

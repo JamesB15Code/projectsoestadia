@@ -21,6 +21,8 @@ import ordenesCompra from "./Views/ordenesCompra";
 import ordenesCompraAdmin from "./Views/ordenesCompraAdmin";
 import showphones from "./Views/showphones";
 import showtablets from "./Views/showTablets"
+import showAcesorios from "./Views/showAccesorios"
+import showAudio from "./Views/showAudio"
 
 function App() {
   return (
@@ -33,6 +35,8 @@ function App() {
             <Route path='/registro' Component={registro}/>
             <Route path='/showphones' Component={showphones}/>
             <Route path='/showtablets' Component={showtablets}/>
+            <Route path='/showAcesorios' Component={showAcesorios}/>
+            <Route path='/showAudio' Component={showAudio}/>
 
             <Route path='/crudProducts' Component={crudProducts}/>
             <Route path='/crudUsers' Component={crudUsers}/>

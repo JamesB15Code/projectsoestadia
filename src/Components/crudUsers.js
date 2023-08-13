@@ -3,7 +3,7 @@ import axios from "axios";
 import Swal from "sweetalert2";
 import { show_alerta } from "../funtions";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faTrash, faEdit, faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
+import { faTrash, faEdit, faEye, faEyeSlash,faLock } from "@fortawesome/free-solid-svg-icons";
 
 const CrudUsarios = () => {
   const [users, setUsers] = useState([]);
@@ -54,6 +54,8 @@ const CrudUsarios = () => {
     }
     window.setTimeout(function () {
       document.getElementById("nombre").focus();
+      const modalregistro= document.getElementById("ModalReg");
+      modalregistro.style.display="block";
     }, 500);
   };
 
@@ -90,20 +92,38 @@ const CrudUsarios = () => {
   };
 
   const guardar = async (parametros1) => {
+    const existingUsername = users.find((user) => user.username === parametros1.username);
+    const existingCorreo = users.find((user) => user.correo === parametros1.correo);
+  
+    if (existingUsername && existingCorreo) {
+      show_alerta("El usuario y el correo ya existen en la lista.", "warning");
+      return;
+    } else if (existingUsername) {
+      show_alerta("El usuario ya existe en la lista.", "warning");
+      return;
+    } else if (existingCorreo) {
+      show_alerta("El correo ya existe en la lista.", "warning");
+      return;
+    }
+  
     try {
-      const response = await axios.post(url, parametros1);
+      await axios.post(url, parametros1);
       show_alerta("Guardado", "success");
+      const modalreg= document.getElementById("ModalReg");
+      modalreg.style.display="none";
       getUser();
     } catch (error) {
       show_alerta("Error al guardar", "error");
       console.log(error);
     }
   };
-
+  
   const editar = async (parametros, idUsuarios) => {
     try {
       await axios.put(`${url}?idUsuarios=${idUsuarios}`, parametros);
       show_alerta("Actualizado", "success");
+      const modalreg= document.getElementById("ModalReg");
+      modalreg.style.display="none";
       getUser();
     } catch (error) {
       show_alerta("Error al editar", "error");
@@ -134,6 +154,12 @@ const CrudUsarios = () => {
       }
     });
   };
+
+  const renderDataOrLock = (data) => {
+    return <FontAwesomeIcon icon={faLock} />;
+  };
+
+  const canEdit = (rol) => rol === '2'; 
 
   return (
     <div className="container">
@@ -166,24 +192,27 @@ const CrudUsarios = () => {
                     <th>Acción</th>
                   </tr>
                 </thead>
-                <tbody className="table-group-divider">
+                <tbody className="table-group-divider text-center">
                   {users.map(({ idUsuarios, nombre, username, contraseña, correo, pregunta, respuesta, idRol }, i) => (
                     <tr key={idUsuarios}>
                       <td>{(i + 1)}</td>
                       <td>{nombre}</td>
                       <td>{username}</td>
-                      <td>{contraseña}</td>
+                      <td>{renderDataOrLock(contraseña)}</td>
                       <td>{correo}</td>
                       <td>{pregunta}</td>
-                      <td>{respuesta}</td>
+                      <td>{renderDataOrLock(respuesta)}</td>
                       { (idRol === '2') ? <td>admin</td> : <td>usuario</td> }
-                      <td className="d-flex justify-content-center">
-                        <button
-                          onClick={() => openEditor(2, idUsuarios, nombre, username, contraseña, correo, pregunta, respuesta, idRol)}
-                          className="btn btn-primary"
-                        >
-                          <FontAwesomeIcon icon={faEdit} />
-                        </button>
+
+                       <td className="d-flex justify-content-center">
+                        {canEdit(idRol) && ( // Only show the edit button if the role is 'admin'
+                          <button
+                            onClick={() => openEditor(2, idUsuarios, nombre, username, contraseña, correo, pregunta, respuesta, idRol)}
+                            className="btn btn-primary"
+                          >
+                            <FontAwesomeIcon icon={faEdit} />
+                          </button>
+                        )}
                         &nbsp;
                         <button
                           className="btn btn-danger"
@@ -202,9 +231,8 @@ const CrudUsarios = () => {
         </div>
       </div>
      
-      
       {opcion !== "" && (
-        <div className="modal fade show" style={{ display: "block", backgroundColor: "rgba(0,0,0,0.4)" }}>
+        <div id="ModalReg" className="modal fade show" style={{ display: "block", backgroundColor: "rgba(0,0,0,0.4)" }}>
           <div className="modal-dialog modal-dialog-centered">
             <div className="modal-content">
               <div className="modal-header">

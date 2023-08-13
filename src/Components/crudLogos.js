@@ -40,6 +40,8 @@ const CrudLogos = () => {
     }
     window.setTimeout(function () {
       document.getElementById("tipo").focus();
+      const modalregistro= document.getElementById("ModalReg");
+      modalregistro.style.display="block";
     }, 500);
   };
 
@@ -67,8 +69,10 @@ const CrudLogos = () => {
 
   const guardar = async (parametros1) => {
     try {
-      const response = await axios.post(url, parametros1);
+      await axios.post(url, parametros1);
       show_alerta("Guardado", "success");
+      const modalreg= document.getElementById("ModalReg");
+      modalreg.style.display="none";
       getRedesSociales();
     } catch (error) {
       show_alerta("Error al guardar", "error");
@@ -80,6 +84,8 @@ const CrudLogos = () => {
     try {
       await axios.put(`${url}?idRedes=${idRedes}`, parametros);
       show_alerta("Actualizado", "success");
+      const modalreg= document.getElementById("ModalReg");
+      modalreg.style.display="none";
       getRedesSociales();
     } catch (error) {
       show_alerta("Error al editar", "error");
@@ -144,13 +150,13 @@ const CrudLogos = () => {
                       <th>Acción</th>
                     </tr>
                   </thead>
-                  <tbody className="table-group-divider">
+                  <tbody className="table-group-divider text-center">
                     {redessociales.map(({ idRedes, tipo, enlace }, i) => (
                       <tr key={idRedes}>
                         <td>{i + 1}</td>
                         <td>{tipo}</td>
                         <td>{enlace}</td>
-                        <td>
+                        <td className="d-flex justify-content-center">
                           <button
                             onClick={() => openEditor(2, idRedes, tipo, enlace)}
                             className="btn btn-primary"
@@ -176,9 +182,7 @@ const CrudLogos = () => {
       </div>
 
       {opcion !== "" && (
-        <div
-          className="modal fade show"
-          style={{ display: "block", backgroundColor: "rgba(0,0,0,0.4)" }}
+        <div id="ModalReg" className="modal fade show" style={{ display: "block",backgroundColor: "rgba(0,0,0,0.4)" }}
         >
           <div className="modal-dialog modal-dialog-centered">
             <div className="modal-content">

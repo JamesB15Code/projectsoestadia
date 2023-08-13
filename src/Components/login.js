@@ -36,7 +36,7 @@ export default function Login() {
             "El correo electrónico o la contraseña son incorrectos"
           );
         }
-        console.log(user);
+        //console.log(user);
       })
       .catch((error) => {
         console.error(error);

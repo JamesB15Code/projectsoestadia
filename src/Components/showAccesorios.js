@@ -124,7 +124,7 @@ function HomeScreen() {
       (marcaLC.includes(searchTermLC) ||
       modeloLC.includes(searchTermLC) ||
       colorLC.includes(searchTermLC)) &&
-      product.categoria === "Smartphone"
+      product.categoria === "Accesorios"
     );
   });
 

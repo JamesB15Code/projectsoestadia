@@ -1,18 +1,42 @@
-import React, { useContext, useEffect, useState } from "react";
-import { AuthContext } from "../Auth/AuthProvider";
-import { Card } from "react-bootstrap";
+import React, { useState, useEffect, useContext } from "react";
+import { Modal, Button } from "react-bootstrap";
 import { motion } from "framer-motion";
 import { show_alerta } from "../funtions";
+import { AuthContext } from "../Auth/AuthProvider";
 import axios from "axios";
+
 import "../Css/prodPreview.css";
 
-const ProdPreview = () => {
+function ProductPrewie() {
   const [products, setProducts] = useState([]);
-  const [cantidad, setCantidad] = useState(0);
-  const { isAuthenticated, user } = useContext(AuthContext);
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [selectedImage, setSelectedImage] = useState(null);
   const [showModal, setShowModal] = useState(false);
-  const [modalData, setModalData] = useState({});
-  const URL_PRODUCT = "http://localhost/proyectoApi/apiProducto.php";
+  const [searchTerm, setSearchTerm] = useState("");
+  const [cantidad, setCantidad] = useState(1);
+  const { user } = useContext(AuthContext);
+
+  let userName = localStorage.getItem('username');
+  let userIdUsuario = localStorage.getItem('idUsuario');
+
+  const now = new Date();
+
+  const URL_PRODUCTOS = "http://localhost/proyectoApi/apiProducto.php";
+  const URL_ORDEN_PRODUCTO =
+    "http://localhost/proyectoApi/detallesDeCompra.php";
+
+  // Obtenemos la fecha en formato constante (yyyy-mm-dd)
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, "0");
+  const day = String(now.getDate()).padStart(2, "0");
+  const fechaOrden = `${year}-${month}-${day}`;
+
+  // Obtenemos la hora en formato constante (hh:mm:ss)
+  const hours = String(now.getHours()).padStart(2, "0");
+  const minutes = String(now.getMinutes()).padStart(2, "0");
+  const seconds = String(now.getSeconds()).padStart(2, "0");
+  const horaOrden = `${hours}:${minutes}:${seconds}`;
+  const estado = "PENDIENTE";
 
   useEffect(() => {
     getProducts();
@@ -20,190 +44,277 @@ const ProdPreview = () => {
 
   const getProducts = async () => {
     try {
-      const response = await axios.get(URL_PRODUCT);
+      const response = await axios.get(URL_PRODUCTOS);
       setProducts(response.data.slice(0, 3));
     } catch (error) {
       console.error(error);
     }
   };
 
-  const openModal = (
-    id,
-    marca,
-    modelo,
-    descripcion,
-    existencia,
-    categoria,
-    precio,
-    imagen
-  ) => {
-    setModalData({
-      id,
-      marca,
-      modelo,
-      descripcion,
-      existencia,
-      categoria,
-      precio,
-      imagen,
-    });
+  const openModal = (product) => {
+    setSelectedProduct(product);
+    setSelectedImage(product.imagen);
     setShowModal(true);
   };
-
-  const closeModal = () => {
+  
+  const handleCloseModal = () => {
     setShowModal(false);
   };
 
-  const comprar = () => {
-    if (user) {
-      // Resto del código de la función comprar...
-    } else {
-      show_alerta("No puede agregar al carrito, regístrese", "warning");
+  const handleCompra = async () => {
+    if (userName === "" && userName === null ) {
+      show_alerta("Debe iniciar sesión para realizar una compra.", 'warning');
+      return;
     }
+
+    if (!selectedProduct) {
+      show_alerta("Por favor, seleccione un producto antes de comprar.", 'warning');
+      return;
+    }
+
+    if (selectedProduct.existencia === 0) {
+      show_alerta('Lo sentimos producto agotado', 'warning');
+      return;
+    }
+
+    if (cantidad > selectedProduct.existencia) {
+      show_alerta('Cantidad no disponible', 'warning');
+      return;
+    }
+
+    const precioTotal = selectedProduct.precio * cantidad;
+
+    fetch(URL_ORDEN_PRODUCTO, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        idUsuario: userIdUsuario,
+        idProducto: selectedProduct.idProducto,
+        fecha_orden: fechaOrden,
+        estado: estado,
+        precio_unitario: selectedProduct.precio,
+        precio_total_producto: precioTotal,
+        total: cantidad,
+        hora_orden: horaOrden
+      }),
+    })
+    .then(response => response.json())
+    .then(data => {
+      console.log('Respuesta del servidor:', data);
+      show_alerta("¡Compra realizada con éxito!");
+    })
+    .catch(error => {
+      console.error(error);
+      show_alerta("Hubo un error al procesar la compra. Por favor, intenta nuevamente más tarde.", 'error');
+    });
   };
 
+  const handleThumbnailClick = (image) => {
+    setSelectedImage(image);
+  };
+
+  const filteredProducts = products.filter((product) => {
+    const searchTermLC = searchTerm.toLowerCase();
+    const marcaLC = product.marca.toLowerCase();
+    const modeloLC = product.modelo.toLowerCase();
+    const colorLC = product.color.toLowerCase();
+
+    return (
+      marcaLC.includes(searchTermLC) ||
+      modeloLC.includes(searchTermLC) ||
+      colorLC.includes(searchTermLC)
+    );
+  });
+
   return (
-    <section className="portafolio ">
-      <div className="contenedor ">
-        
-        <h2 className="text-center">{`Productos nuevos`}</h2>
-        <hr className="border-3 opacity-100" style={{ color: "#ffff" }} />
-        <div className="galeria-port ">
-          {products.map((product) => (
+    <div className="contenedor">
+      <div className="row  d-flex justify-content-center">
+      <h2 className="text-center ">Nuestros productos </h2>
+      
+        <div className="row  d-flex justify-content-center ">
+          <hr className="border-3 opacity-100 mt-2" style={{ color: "#ffff" }} />
+          {filteredProducts.map((product) => (
             <div
-              className="col-lg-3 col-md-4 col-sm-6 "
-              key={product._id}
-              onClick={() =>
-                openModal(
-                  product._id,
-                  product.marca,
-                  product.modelo,
-                  product.descripcion,
-                  product.existencia,
-                  product.categoria,
-                  product.precio,
-                  product.imagen
-                )
-              }
-              style={{ cursor: "pointer" }}
+              key={product.idProducto}
+              className="col-md-4 mt-3 mb-4 d-flex justify-content-center"
             >
-              <motion.div
-                className="card-img-container m-1 "
-                key={product.id}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                <Card>
-                  <Card.Img
-                    src={product.imagen}
-                    alt="..."
-                    style={{ objectFit: "cover", height: "100%" }}
-                  />
-                  <Card.Body className="text-center">
-                    <Card.Title style={{ color: "#044D8C" }}>
-                      {product.marca}
-                    </Card.Title>
-                    <Card.Text className="descProducto">
-                      {product.modelo}
-                    </Card.Text>
-                    <Card.Text className="descProducto fs-5">
-                      Desde ${product.precio}
-                    </Card.Text>
-                    <button
-                      className="btn btn btn-primary rounded-5"
-                      id="btn-Agregar"
-                    >
-                      Ver más
-                    </button>
-                  </Card.Body>
-                </Card>
-              </motion.div>
+              <div className=" bg-white p-4 ">
+                <img
+                  src={product.imagen}
+                  alt="Producto"
+                  width="100%"
+                  height="300px"
+                />
+                <div className="card-body flex-column align-items-center ">
+                  <h3 className="card-title text-center text-primary ">{product.marca}</h3>
+                  <div className=" text-center text-primary mt-2 ">
+                    <p>{product.modelo}</p>
+                    <p> {product.color}</p>
+                    <p>Existencia: {product.existencia}</p>
+                  </div>
+                  <button
+                    className="align-items-center btn btn-primary text-center "
+                    onClick={() => openModal(product)}
+                  >
+                    Detalles de producto
+                  </button>
+                </div>
+              </div>
             </div>
           ))}
         </div>
       </div>
 
-      {showModal && (
-        <div className="modal fade show" style={{ display: "block" }}>
-          <div className="modal-dialog modal-dialog-centered modal-lg">
-            <div className="modal-content">
-              <div className="modal-header text-primary">
-                <h5
-                  className="modal-title fs-4"
-                  style={{ fontFamily: "Arial" }}
-                >
-                  Comprar Producto
-                </h5>
-                <button
-                  type="button"
-                  className="btn-close"
-                  data-bs-dismiss="modal"
-                  aria-label="Close"
-                  onClick={closeModal}
-                ></button>
-              </div>
-              <div className="modal-body">
-                <div className="row align-items-center">
-                  <div className="col-md-4">
-                    <img
-                      src={modalData.imagen}
-                      className="img-fluid"
-                      alt={modalData.marca}
-                    />
-                  </div>
-                  <div className="col-md-8">
-                    <h2
-                      id="marca"
-                      className="text-primary"
-                      style={{ fontFamily: "Arial" }}
-                    >
-                      {modalData.marca}
-                    </h2>
-                    <p>{modalData.modelo}</p>
-                    <p className="fs-5">Desde: ${modalData.precio}</p>
-                    <p>{modalData.descripcion}</p>
-                    <div className="form-group">
-                      <label htmlFor="cantidad">Cantidad:</label>
-                      <input
-                        type="number"
-                        id="cantidad"
-                        className="form-control"
-                        min="0"
-                        tabIndex="2"
-                        placeholder="0"
-                        onChange={(e) => setCantidad(e.target.value)}
+      <Modal show={showModal} onHide={handleCloseModal} size="lg">
+        <Modal.Header closeButton>
+          <Modal.Title>Detalles de producto</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {selectedProduct && (
+            <div>
+              <div className="row d-flex justify-content-center">
+                <div className="col-md-7 ">
+                  <motion.img
+                    src={selectedImage}
+                    className="img-fluid  h-100 w-100"
+                    alt={selectedProduct.marca}
+                    whileHover={{ scale: 1.1 }}
+                  />
+                </div>
+                <div className="col-md-4">
+                  <div className="d-flex flex-column align-items-center">
+                    {selectedProduct.imagen && (
+                      <motion.img
+                        src={selectedProduct.imagen}
+                        className={`img-thumbnail my-2 ${
+                          selectedImage === selectedProduct.imagen
+                            ? "selected"
+                            : ""
+                        }`}
+                        alt={selectedProduct.marca}
+                        style={{
+                          width: "80px",
+                          height: "auto",
+                          cursor: "pointer",
+                        }}
+                        onClick={() =>
+                          handleThumbnailClick(selectedProduct.imagen)
+                        }
+                        whileHover={{ scale: 1.1 }}
                       />
-                    </div>
-                    <hr />
-                    <div className="d-grid col-6 mx-auto mt-4">
-                      <button
-                        className="btn btn-primary rounded-5"
-                        onClick={comprar}
-                      >
-                        <i className="fa-solid fa-floppy-disk "></i> Agregar al
-                        carrito
-                      </button>
-                    </div>
+                    )}
+                    {selectedProduct.imagen2 && (
+                      <motion.img
+                        src={selectedProduct.imagen2}
+                        className={`img-thumbnail my-2 ${
+                          selectedImage === selectedProduct.imagen2
+                            ? "selected"
+                            : ""
+                        }`}
+                        alt={selectedProduct.marca}
+                        style={{
+                          width: "80px",
+                          height: "auto",
+                          cursor: "pointer",
+                        }}
+                        onClick={() =>
+                          handleThumbnailClick(selectedProduct.imagen2)
+                        }
+                        whileHover={{ scale: 1.1 }}
+                      />
+                    )}
+                    {selectedProduct.imagen3 && (
+                      <motion.img
+                        src={selectedProduct.imagen3}
+                        className={`img-thumbnail my-2 ${
+                          selectedImage === selectedProduct.imagen3
+                            ? "selected"
+                            : ""
+                        }`}
+                        alt={selectedProduct.marca}
+                        style={{
+                          width: "80px",
+                          height: "auto",
+                          cursor: "pointer",
+                        }}
+                        onClick={() =>
+                          handleThumbnailClick(selectedProduct.imagen3)
+                        }
+                        whileHover={{ scale: 1.1 }}
+                      />
+                    )}
+                    {selectedProduct.imagen4 && (
+                      <motion.img
+                        src={selectedProduct.imagen4}
+                        className={`img-thumbnail my-2 ${
+                          selectedImage === selectedProduct.imagen4
+                            ? "selected"
+                            : ""
+                        }`}
+                        alt={selectedProduct.marca}
+                        style={{
+                          width: "80px",
+                          height: "auto",
+                          cursor: "pointer",
+                        }}
+                        onClick={() =>
+                          handleThumbnailClick(selectedProduct.imagen4)
+                        }
+                        whileHover={{ scale: 1.1 }}
+                      />
+                    )}
                   </div>
                 </div>
               </div>
-              <div className="modal-footer">
-                <button
-                  id="btncerrar"
-                  type="button"
-                  className="btn btn-secondary "
-                  data-bs-dismiss="modal"
-                  onClick={closeModal}
-                >
-                  Cerrar
-                </button>
+              <div className="container">
+                <h2 className="text-primary" style={{ fontFamily: "Arial" }}>
+                  {selectedProduct.marca}
+                </h2>
+                <p>{selectedProduct.modelo}</p>
+                <p>{selectedProduct.descripcion}</p>
+                <p>Color {selectedProduct.color}</p>
+                <p>Precio: ${selectedProduct.precio}</p>
+                <p>Existencia: {selectedProduct.existencia}</p>
+                <div className="form-group">
+                  <label htmlFor="cantidad">Cantidad:</label>
+                  <input
+                    type="number"
+                    id="no2"
+                    min="1"
+                    tabIndex="2"
+                    defaultValue="1" // Establecer valor predeterminado a 1
+                    onChange={(e) => setCantidad(e.target.value)}
+                  />
+                </div>
               </div>
             </div>
-          </div>
-        </div>
-      )}
-    </section>
-  );
-};
+          )}
 
-export default ProdPreview;
+          {userName ? ( // Verificar si el usuario ha iniciado sesión
+              <div className="d-grid col-4 mx-auto mt-2">
+                <Button
+                  className="btn btn-primary rounded-5"
+                  onClick={handleCompra}
+                >
+                  <i className="fa-solid fa-floppy-disk"></i> Comprar
+                </Button>
+              </div>
+            ) : (
+              <div className="text-center mt-5">
+                <p className="fs-5">Inicia sesión para poder realizar una compra.</p>
+              </div>
+            )}
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleCloseModal}>
+            Cerrar
+          </Button>
+        </Modal.Footer>
+      </Modal>
+    </div>
+  );
+}
+
+export default ProductPrewie;

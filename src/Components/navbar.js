@@ -5,7 +5,6 @@ import { useContext } from "react";
 import { AuthContext } from "../Auth/AuthProvider";
 import NavDropdown from "react-bootstrap/NavDropdown";
 import { Navbar, Nav, Dropdown } from "react-bootstrap";
-import NavbarAdmin from "./navbar2";
 import axios from "axios";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -13,7 +12,7 @@ import { faCircleUser, faShoppingCart, faSignOutAlt } from "@fortawesome/free-so
 
 export default function Navbarr() {
   const history = useNavigate();
-  const { isAuthenticated, logout, user } = useContext(AuthContext);
+  const { isAuthenticated, logout } = useContext(AuthContext);
   const [infEmpresa, setInfEmpresa] = useState({ logo: "../img/logo.png" });
   const URL_INFEMPRESA = "http://localhost/proyectoApi/apiEmpresa.php";
 
@@ -207,16 +206,16 @@ export default function Navbarr() {
                 Inicio
               </Nav.Link>
               <Nav.Link className="text-light" as={Link} to="/showphones">
-                Smartphone
+                Telefonos
               </Nav.Link>
               <Nav.Link className="text-light" as={Link} to="/showtablets">
-                Tablets
+                Tabletas
               </Nav.Link>
-              <Nav.Link className="text-light" as={Link} to="/somos">
+              <Nav.Link className="text-light" as={Link} to="/showAudio">
                 Audio
               </Nav.Link>
-              <Nav.Link className="text-light " as={Link} to="/prueba">
-                Pruebas
+              <Nav.Link className="text-light " as={Link} to="/showAcesorios">
+                Accesorios
               </Nav.Link>
             </Nav>
 
@@ -294,5 +293,4 @@ export default function Navbarr() {
       </Navbar>
     );
   }
-
 }

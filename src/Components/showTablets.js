@@ -3,7 +3,7 @@ import { Modal, Button } from "react-bootstrap";
 import { motion } from "framer-motion";
 import { show_alerta } from "../funtions";
 import { AuthContext } from "../Auth/AuthProvider";
-import axios from "axios";
+
 
 import "../Css/prodPreview.css";
 
@@ -15,6 +15,9 @@ function HomeScreen() {
   const [searchTerm, setSearchTerm] = useState("");
   const [cantidad, setCantidad] = useState(1);
   const { user } = useContext(AuthContext);
+
+  let userName = localStorage.getItem('username');
+  let userIdUsuario = localStorage.getItem('idUsuario');
 
   const now = new Date();
 
@@ -43,7 +46,7 @@ function HomeScreen() {
     let response = await fetch(URL_PRODUCTOS);
     let respJson = await response.json();
     setProducts(respJson);
-    console.log("Productos:", respJson);
+    //console.log("Productos:", respJson);
   }
 
   const openModal = (product) => {
@@ -53,7 +56,7 @@ function HomeScreen() {
   };
 
   const handleCompra = async () => {
-    if (!user) {
+    if (userName === "" && userName === null ) {
       show_alerta("Debe iniciar sesión para realizar una compra.", 'warning');
       return;
     }
@@ -81,7 +84,7 @@ function HomeScreen() {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        idUsuario: user.idUsuarios,
+        idUsuario: userIdUsuario,
         idProducto: selectedProduct.idProducto,
         fecha_orden: fechaOrden,
         estado: estado,
@@ -95,45 +98,13 @@ function HomeScreen() {
     .then(data => {
       console.log('Respuesta del servidor:', data);
       show_alerta("¡Compra realizada con éxito!");
-      actualizarExistenciaProducto();
+      //actualizarExistenciaProducto();
     })
     .catch(error => {
       console.error(error);
       show_alerta("Hubo un error al procesar la compra. Por favor, intenta nuevamente más tarde.", 'error');
     });
   };
-
-  const actualizarExistenciaProducto = async () => {
-    const resultadoExistencia = selectedProduct.existencia - cantidad;
-
-    fetch(`${URL_PRODUCTOS}?idProducto=${selectedProduct.idProducto}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        marca: selectedProduct.marca,
-        modelo: selectedProduct.modelo,
-        color: selectedProduct.color,
-        descripcion: selectedProduct.descripcion,
-        categoria: selectedProduct.categoria,
-        cantidad:  selectedProduct.cantidad,
-        existencia: resultadoExistencia,
-        precio: selectedProduct.precio,
-        imagen: selectedProduct.imagen,
-        imagen2: selectedProduct.imagen2,
-        imagen3: selectedProduct.imagen3,
-        imagen4: selectedProduct.imagen4
-      }),
-    })
-    .then(response => response.json())
-    .then(response => {
-      getData();
-    })
-    .catch(error => {
-      console.error(error);
-    });
-  }
 
   const handleCloseModal = () => {
     setShowModal(false);
@@ -165,7 +136,7 @@ function HomeScreen() {
           <input
             type="text"
             className="form-control"
-            placeholder="Buscar por marca..."
+            placeholder="Buscar producto..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
@@ -176,7 +147,7 @@ function HomeScreen() {
               key={product.idProducto}
               className="col-md-4 mb-4 d-flex justify-content-center"
             >
-              <div className="card h-100 border-5d ">
+              <div className="border shadow p-4 h-100 border-5d ">
                 <img
                   src={product.imagen}
                   alt="Producto"
@@ -319,21 +290,28 @@ function HomeScreen() {
                     id="no2"
                     min="1"
                     tabIndex="2"
-                    defaultValue="1" 
+                    defaultValue="1" // Establecer valor predeterminado a 1
                     onChange={(e) => setCantidad(e.target.value)}
                   />
                 </div>
               </div>
             </div>
           )}
-          <div className="d-grid col-4 mx-auto mt-2">
-            <Button
-              className="btn btn-primary rounded-5"
-              onClick={handleCompra}
-            >
-              <i className="fa-solid fa-floppy-disk"></i> Agregar al carrito
-            </Button>
-          </div>
+
+          {userName ? ( // Verificar si el usuario ha iniciado sesión
+              <div className="d-grid col-4 mx-auto mt-2">
+                <Button
+                  className="btn btn-primary rounded-5"
+                  onClick={handleCompra}
+                >
+                  <i className="fa-solid fa-floppy-disk"></i> Comprar
+                </Button>
+              </div>
+            ) : (
+              <div className="text-center mt-3">
+                <p>Inicia sesión para poder realizar una compra.</p>
+              </div>
+            )}
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={handleCloseModal}>
