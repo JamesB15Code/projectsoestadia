@@ -19,17 +19,17 @@ import {
   RedditIcon,
   InstagramIcon,
 } from "../iconos";
+import { Button, Modal } from "react-bootstrap";
 
-
+import {URL_EMPRESA, URL_REDES_SOCIALES} from "../Url" 
 
 function Footer() {
   const [redes, setRedes] = useState([]);
   const [infEmpresa, setInfEmpresa] = useState({});
   const [showModal, setShowModal] = useState(false);
+  const [showModal2, setShowModal2] = useState(false);
   const [modalData, setModalData] = useState({});
-  const URL_INFOEMPRESA = "http://localhost/proyectoApi/apiEmpresa.php";
-  const URL_REDES = "http://localhost/proyectoApi/apiRedesSociales.php";
-  
+
   useEffect(() => {
     getRedes();
     getInformacionEmpresa();
@@ -37,7 +37,7 @@ function Footer() {
 
   const getRedes = async () => {
     try {
-      const response = await axios.get(URL_REDES);
+      const response = await axios.get(URL_REDES_SOCIALES);
       setRedes(response.data);
     } catch (error) {
       console.error(error);
@@ -46,7 +46,7 @@ function Footer() {
 
   const getInformacionEmpresa = async () => {
     try {
-      const response = await axios.get(URL_INFOEMPRESA);
+      const response = await axios.get(URL_EMPRESA);
       setInfEmpresa(response.data[0]);
     } catch (error) {
       console.error(error);
@@ -85,6 +85,14 @@ function Footer() {
 
   const handleModalClose = () => {
     setShowModal(false);
+  };
+
+  const handleCloseModal = () => {
+    setShowModal2(false);
+  };
+
+  const handleOpenModal = () => {
+    setShowModal2(true);
   };
 
   return (
@@ -164,9 +172,20 @@ function Footer() {
                 </h6>
               )}
             </div>
+            <div className="text-center">
+              <h6
+                className=""
+                style={{ cursor: "pointer" }}
+                onClick={handleOpenModal}
+              >
+                <FontAwesomeIcon icon={faFile} className="me-2" />
+                Departamento de TIC
+              </h6>
+            </div>
           </div>
+
           {showModal && (
-            <div className="modal" style={{ display: "block" }}>
+            <div id="ModalReg" className="modal fade show" style={{ display: "block",backgroundColor: "rgba(0,0,0,0.6)" }}>
               <div
                 className="modal-dialog modal-dialog-centered modal-lg
               "
@@ -187,6 +206,52 @@ function Footer() {
               </div>
             </div>
           )}
+          <Modal show={showModal2} onHide={handleCloseModal} size="md">
+            <Modal.Header closeButton>
+              <Modal.Title className="">Departamento de TIC</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+              <div className="text-center">
+                <div className=" text-primary m-2 border-3d text-center">
+                    <h3 className="modal-title">
+                      Supervisores del proyecto
+                    </h3>
+                    <div className="m-2 text-start">
+                      <p className="align-items-center mb-1">
+                        <span>M.T.I. Carlos Andrés Rodríguez Argüelles</span>
+                      </p>
+                      <p className="align-items-center mb-1">
+                        <span>ING. José de Jesús González Torres</span>
+                      </p>
+                      <p className="align-items-center mb-1">
+                        <span>M.A. Ricardo García Morales</span>
+                      </p>
+                      <p className="align-items-center mb-1">
+                        <span>I.S.C. Gadiel Ramos Hernández</span>
+                      </p>
+                      <p className="align-items-center mb-1">
+                        <span>M.T.I Juvencio Mendoza Castelán</span>
+                      </p>
+                    </div>
+                </div>
+                <div className=" text-primary mt-2 text-center">
+                  <div className="text-center">
+                    <h3 className="modal-title">Desarrollador</h3>
+                    <div className="">
+                      <p className="align-items-center">
+                        <span className="fs-5">T.S.U. James Brian Hernández Hernández </span>
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </Modal.Body>
+            <Modal.Footer>
+              <Button variant="secondary" onClick={handleCloseModal}>
+                Cerrar
+              </Button>
+            </Modal.Footer>
+          </Modal>
 
           <div className="col-md-4 text-white ">
             <hr className="border-3 opacity-100" style={{ color: "#fff" }} />
@@ -252,7 +317,8 @@ function Footer() {
                 &copy; 2023{" "}
                 {infEmpresa && infEmpresa.nombre
                   ? infEmpresa.nombre
-                  : "M&G INNOVACIONES"}{". "}
+                  : "M&G INNOVACIONES"}
+                {". "}
                 Todos los derechos reservados.
               </p>
             </div>

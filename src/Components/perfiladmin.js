@@ -34,7 +34,6 @@ const Admin = () => {
     if (!isAuthenticated) {
       history("/");
     } else {
-      // Agregar una animación suave cuando el componente se monta
       setAnimationClass("animate__animated animate__fadeInUp");
     }
   }, [isAuthenticated, history]);

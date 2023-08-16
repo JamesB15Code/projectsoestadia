@@ -5,6 +5,8 @@ import { show_alerta } from "../funtions";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrash, faEdit } from "@fortawesome/free-solid-svg-icons";
 
+import {URL_REDES_SOCIALES} from "../Url" 
+
 const CrudLogos = () => {
   const [redessociales, setRedesSociales] = useState([]);
   const [idR, setId] = useState("");
@@ -14,14 +16,14 @@ const CrudLogos = () => {
 
   const [opcion, setOpcion] = useState("");
   const [titulo, setTitulo] = useState("");
-  const url = "http://localhost/proyectoApi/apiRedesSociales.php";
+  
 
   useEffect(() => {
     getRedesSociales();
   }, []);
 
   const getRedesSociales = async () => {
-    const res = await axios.get(url);
+    const res = await axios.get(URL_REDES_SOCIALES);
     setRedesSociales(res.data);
   };
 
@@ -69,7 +71,7 @@ const CrudLogos = () => {
 
   const guardar = async (parametros1) => {
     try {
-      await axios.post(url, parametros1);
+      await axios.post(URL_REDES_SOCIALES, parametros1);
       show_alerta("Guardado", "success");
       const modalreg= document.getElementById("ModalReg");
       modalreg.style.display="none";
@@ -82,7 +84,7 @@ const CrudLogos = () => {
 
   const editar = async (parametros, idRedes) => {
     try {
-      await axios.put(`${url}?idRedes=${idRedes}`, parametros);
+      await axios.put(`${URL_REDES_SOCIALES}?idRedes=${idRedes}`, parametros);
       show_alerta("Actualizado", "success");
       const modalreg= document.getElementById("ModalReg");
       modalreg.style.display="none";
@@ -106,7 +108,7 @@ const CrudLogos = () => {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          await axios.delete(`${url}?idRedes=${idRedes}`);
+          await axios.delete(`${URL_REDES_SOCIALES}?idRedes=${idRedes}`);
           show_alerta("Eliminado", "success");
           getRedesSociales();
         } catch (error) {

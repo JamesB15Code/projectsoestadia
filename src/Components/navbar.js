@@ -10,11 +10,13 @@ import axios from "axios";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCircleUser, faShoppingCart, faSignOutAlt } from "@fortawesome/free-solid-svg-icons";
 
+import {URL_EMPRESA} from "../Url" 
+
 export default function Navbarr() {
   const history = useNavigate();
   const { isAuthenticated, logout } = useContext(AuthContext);
   const [infEmpresa, setInfEmpresa] = useState({ logo: "../img/logo.png" });
-  const URL_INFEMPRESA = "http://localhost/proyectoApi/apiEmpresa.php";
+  
 
   let userNombre = localStorage.getItem('nombre');
   let userCorreo = localStorage.getItem('correo');
@@ -26,7 +28,7 @@ export default function Navbarr() {
 
   const getInformacionEmpresa = async () => {
     try {
-      const response = await axios.get(URL_INFEMPRESA);
+      const response = await axios.get(URL_EMPRESA);
       setInfEmpresa(response.data[0]);
     } catch (error) {
       console.error(error);
@@ -48,11 +50,22 @@ export default function Navbarr() {
       >
         <div className="container">
           <Navbar.Brand as={Link} to="/">
-            {infEmpresa && infEmpresa.logo ? (
-              <img width="50" src={infEmpresa.logo} alt="" />
-            ) : (
-              <img width="50" src={infEmpresa} alt="" />
-            )}
+          <div className="d-flex ms-2 me-3">
+              <div>
+                {infEmpresa && infEmpresa.logo ? (
+                  <img width="50" src={infEmpresa.logo} alt="" />
+                ) : (
+                  <img width="50" src={infEmpresa} alt="" />
+                )}
+              </div>
+              <div className="mt-2 h4">
+                {infEmpresa && infEmpresa.nombre ? (
+                  infEmpresa.nombre
+                ) : (
+                  <span>M&G INNOVACIONES</span>
+                )}
+              </div>
+            </div>
           </Navbar.Brand>
   
           <Navbar.Toggle aria-controls="navbar-nav" />

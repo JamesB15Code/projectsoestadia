@@ -6,6 +6,8 @@ import { show_alerta } from "../funtions";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrash, faEdit } from "@fortawesome/free-solid-svg-icons";
 
+import {URL_CLOUDINARY, URL_PRODUCTOS,URL_SELECT_PRODUCT} from "../Url" 
+
 const CrudProducts = () => {
   const [products, setProducts] = useState([]);
   const [id, setId] = useState("");
@@ -32,10 +34,12 @@ const CrudProducts = () => {
     imagen4: "",
   });
 
-  const URL_PRODUCTOS_SELECT = "http://localhost/proyectoApi/selectProduct.php";
-  const urlCloudinary =
-    "https://api.cloudinary.com/v1_1/dchgfutbv/image/upload";
-  const URL_PRODUCTOS = "http://localhost/proyectoApi/apiProducto.php";
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(5);
+
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = products.slice(indexOfFirstItem, indexOfLastItem);
 
   useEffect(() => {
     getProducts();
@@ -54,7 +58,7 @@ const CrudProducts = () => {
 
   const getSelectedProducts = async () => {
     try {
-      const response = await axios.get(URL_PRODUCTOS_SELECT);
+      const response = await axios.get(URL_SELECT_PRODUCT);
       setSelectedProducts(response.data.map((product) => product.idProducto));
     } catch (error) {
       console.error("Error fetching selected products:", error);
@@ -67,7 +71,7 @@ const CrudProducts = () => {
     data.append("file", files[0]);
     data.append("upload_preset", "innovaciones");
     try {
-      const res = await fetch(urlCloudinary, {
+      const res = await fetch(URL_CLOUDINARY, {
         method: "POST",
         body: data,
       });
@@ -263,11 +267,13 @@ const CrudProducts = () => {
     });
   };
 
+  const totalPages = Math.ceil(products.length / itemsPerPage);
+
   const toggleProductSelection = async (productId) => {
     if (selectedProduct.includes(productId)) {
       // Deselection
       try {
-        await axios.delete(`${URL_PRODUCTOS_SELECT}?idSelect=${productId}`);
+        await axios.delete(`${URL_SELECT_PRODUCT}?idSelect=${productId}`);
         setSelectedProducts((prevSelectedProducts) =>
           prevSelectedProducts.filter((idSelect) => idSelect !== productId)
         );
@@ -283,7 +289,7 @@ const CrudProducts = () => {
         return;
       }
       try {
-        await axios.post(URL_PRODUCTOS_SELECT, { idProducto: productId });
+        await axios.post(URL_SELECT_PRODUCT, { idProducto: productId });
         setSelectedProducts((prevSelectedProducts) => [
           ...prevSelectedProducts,
           productId,
@@ -295,8 +301,6 @@ const CrudProducts = () => {
       }
     }
   };
-
-  
 
   const getBrandAndModel = (productId) => {
     const selectedProduct = products.find(
@@ -342,7 +346,7 @@ const CrudProducts = () => {
               </div>
             </div>
           </div>
-
+          
           <div className="row mt-3">
             <div className="col-12 col-md-12 offset-0 offset-lg-0">
               <div className="table-responsive">
@@ -366,7 +370,7 @@ const CrudProducts = () => {
                     </tr>
                   </thead>
                   <tbody className="table-group-divider">
-                    {products.map((product, i) => (
+                    {currentItems.map((product, i) => (
                       <tr key={product.idProducto}>
                         <td>{i + 1}</td>
                         <td>{product.marca}</td>
@@ -455,8 +459,52 @@ const CrudProducts = () => {
               </div>
             </div>
           </div>
+          <div className="d-flex justify-content-center">
+            <nav aria-label="Page navigation">
+              <ul className="pagination">
+                <li
+                  className={`page-item ${currentPage === 1 ? "disabled" : ""}`}
+                >
+                  <button
+                    className="page-link"
+                    onClick={() => setCurrentPage(currentPage - 1)}
+                  >
+                    Anterior
+                  </button>
+                </li>
+                {Array.from({ length: totalPages }).map((_, index) => (
+                  <li
+                    key={index}
+                    className={`page-item ${
+                      currentPage === index + 1 ? "active" : ""
+                    }`}
+                  >
+                    <button
+                      className="page-link"
+                      onClick={() => setCurrentPage(index + 1)}
+                    >
+                      {index + 1}
+                    </button>
+                  </li>
+                ))}
+                <li
+                  className={`page-item ${
+                    currentPage === totalPages ? "disabled" : ""
+                  }`}
+                >
+                  <button
+                    className="page-link"
+                    onClick={() => setCurrentPage(currentPage + 1)}
+                  >
+                    Siguiente
+                  </button>
+                </li>
+              </ul>
+            </nav>
+          </div>
         </div>
       </div>
+
       {opcion !== "" && (
         <div
           id="ModalReg"

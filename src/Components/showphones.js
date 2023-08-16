@@ -4,6 +4,8 @@ import { motion } from "framer-motion";
 import { show_alerta } from "../funtions";
 import { AuthContext } from "../Auth/AuthProvider";
 
+import {URL_PRODUCTOS,URL_DETALLES_COMPRA} from "../Url" 
+
 import "../Css/prodPreview.css";
 
 function HomeScreen() {
@@ -15,14 +17,11 @@ function HomeScreen() {
   const [cantidad, setCantidad] = useState(1);
   const { user } = useContext(AuthContext);
 
-  let userName = localStorage.getItem('username');
-  let userIdUsuario = localStorage.getItem('idUsuario');
+  let userName = localStorage.getItem("username");
+  let userIdUsuario = localStorage.getItem("idUsuario");
 
   const now = new Date();
 
-  const URL_PRODUCTOS = "http://localhost/proyectoApi/apiProducto.php";
-  const URL_ORDEN_PRODUCTO =
-    "http://localhost/proyectoApi/detallesDeCompra.php";
 
   // Obtenemos la fecha en formato constante (yyyy-mm-dd)
   const year = now.getFullYear();
@@ -55,32 +54,35 @@ function HomeScreen() {
   };
 
   const handleCompra = async () => {
-    if (userName === "" && userName === null ) {
-      show_alerta("Debe iniciar sesión para realizar una compra.", 'warning');
+    if (userName === "" && userName === null) {
+      show_alerta("Debe iniciar sesión para realizar una compra.", "warning");
       return;
     }
 
     if (!selectedProduct) {
-      show_alerta("Por favor, seleccione un producto antes de comprar.", 'warning');
+      show_alerta(
+        "Por favor, seleccione un producto antes de comprar.",
+        "warning"
+      );
       return;
     }
 
     if (selectedProduct.existencia === 0) {
-      show_alerta('Lo sentimos producto agotado', 'warning');
+      show_alerta("Lo sentimos producto agotado", "warning");
       return;
     }
 
     if (cantidad > selectedProduct.existencia) {
-      show_alerta('Cantidad no disponible', 'warning');
+      show_alerta("Cantidad no disponible", "warning");
       return;
     }
 
     const precioTotal = selectedProduct.precio * cantidad;
 
-    fetch(URL_ORDEN_PRODUCTO, {
-      method: 'POST',
+    fetch(URL_DETALLES_COMPRA, {
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({
         idUsuario: userIdUsuario,
@@ -90,19 +92,22 @@ function HomeScreen() {
         precio_unitario: selectedProduct.precio,
         precio_total_producto: precioTotal,
         total: cantidad,
-        hora_orden: horaOrden
+        hora_orden: horaOrden,
       }),
     })
-    .then(response => response.json())
-    .then(data => {
-      console.log('Respuesta del servidor:', data);
-      show_alerta("¡Compra realizada con éxito!");
-      //actualizarExistenciaProducto();
-    })
-    .catch(error => {
-      console.error(error);
-      show_alerta("Hubo un error al procesar la compra. Por favor, intenta nuevamente más tarde.", 'error');
-    });
+      .then((response) => response.json())
+      .then((data) => {
+        console.log("Respuesta del servidor:", data);
+        show_alerta("¡Compra realizada con éxito!");
+      })
+      .catch((error) => {
+        console.error(error);
+        show_alerta(
+          "Hubo un error al procesar la compra. Por favor, intenta nuevamente más tarde.",
+          "error"
+        );
+      });
+      setShowModal(false);
   };
 
   const handleCloseModal = () => {
@@ -122,8 +127,8 @@ function HomeScreen() {
 
     return (
       (marcaLC.includes(searchTermLC) ||
-      modeloLC.includes(searchTermLC) ||
-      colorLC.includes(searchTermLC)) &&
+        modeloLC.includes(searchTermLC) ||
+        colorLC.includes(searchTermLC)) &&
       product.categoria === "Smartphone"
     );
   });
@@ -297,20 +302,20 @@ function HomeScreen() {
             </div>
           )}
 
-          {userName ? ( // Verificar si el usuario ha iniciado sesión
-              <div className="d-grid col-4 mx-auto mt-2">
-                <Button
-                  className="btn btn-primary rounded-5"
-                  onClick={handleCompra}
-                >
-                  <i className="fa-solid fa-floppy-disk"></i> Comprar
-                </Button>
-              </div>
+          <div className="d-grid col-4 mx-auto mt-2">
+            {userName ? (
+              <Button
+                className="btn btn-primary rounded-5"
+                onClick={handleCompra}
+              >
+                <i className="fa-solid fa-floppy-disk"></i> Comprar
+              </Button>
             ) : (
-              <div className="text-center mt-3">
-                <p>Inicia sesión para poder realizar una compra.</p>
-              </div>
+              <p className="mt-3 text-center">
+                Inicia sesión para poder realizar una compra.
+              </p>
             )}
+          </div>
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={handleCloseModal}>

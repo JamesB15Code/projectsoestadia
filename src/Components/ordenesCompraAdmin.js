@@ -13,7 +13,7 @@ function OrdenesDeCompraAdministrador() {
 
     const obtenerTodasLasOrdenesCompra = async () => {
         try {
-            const response = await fetch('http://localhost/proyectoApi/detallesDeCompra.php');
+            const response = await fetch('https://mginnovaviones.website/proyectoApi/detallesDeCompra.php');
             const data = await response.json();
             setOrdenesCompra(data);
         } catch (error) {
@@ -41,12 +41,12 @@ function OrdenesDeCompraAdministrador() {
                         return;
                     }
 
-                    const response = await fetch(`http://localhost/proyectoApi/apiProducto.php?idProducto=${orden.idProducto}`);
+                    const response = await fetch(`https://mginnovaviones.website/proyectoApi/apiProducto.php?idProducto=${orden.idProducto}`);
                     const producto = await response.json();
                     const existenciaActual = producto.existencia;
                     const existencia = existenciaActual - orden.total;
                     
-                const updateResponse = await fetch(`http://localhost/proyectoApi/addExistencia.php?idProducto=${orden.idProducto}`, {
+                const updateResponse = await fetch(`https://mginnovaviones.website/proyectoApi/addExistencia.php?idProducto=${orden.idProducto}`, {
                         method: 'PUT',
                         headers: {
                             'Content-Type': 'application/json',
@@ -60,7 +60,7 @@ function OrdenesDeCompraAdministrador() {
                     }
                 }
 
-                const response = await fetch(`http://localhost/proyectoApi/detallesDeCompra.php?idOrdenCompra=${idOrdenCompra}`, {
+                const response = await fetch(`https://mginnovaviones.website/proyectoApi/detallesDeCompra.php?idOrdenCompra=${idOrdenCompra}`, {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',

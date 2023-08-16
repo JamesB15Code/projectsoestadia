@@ -4,8 +4,10 @@ import { faHouse } from "@fortawesome/free-solid-svg-icons";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../Auth/AuthProvider";
 
+
+import {URL_USUARIOS} from "../Url" 
+
 export default function RecupararContraseña() {
-  const URL_USER = "http://localhost/proyectoApi/apiUsuario.php";
   const histori = useNavigate();
   const { login } = useContext(AuthContext);
   const [email, setEmail] = useState("");
@@ -17,7 +19,7 @@ export default function RecupararContraseña() {
 
   const recuperarContraseñaUser = (e) => {
     e.preventDefault();
-    fetch(URL_USER)
+    fetch(URL_USUARIOS)
       .then((response) => response.json())
       .then((data) => {
         const user = data.find(

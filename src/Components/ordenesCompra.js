@@ -4,13 +4,16 @@ import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import { show_alerta } from '../funtions';
 
+
+import {URL_DETALLES_COMPRA} from "../Url" 
+
 function OrdenesDeCompraUsuario() {
     const { user, isAuthenticated } = useContext(AuthContext);
     const history = useNavigate();
     const [ordenesCompra, setOrdenesCompra] = useState([]);
     const [filtroEstado, setFiltroEstado] = useState('TODOS'); // Estado inicial 'TODOS'
     
-    const URL_ORDEN_PRODUCTO = "http://localhost/proyectoApi/detallesDeCompra.php";
+    
 
     let userIdUsuario = localStorage.getItem('idUsuario');
 
@@ -27,7 +30,7 @@ function OrdenesDeCompraUsuario() {
 
     const obtenerOrdenesCompraUsuario = async (idUsuario) => {
         try {
-            const response = await fetch(`${URL_ORDEN_PRODUCTO}?idUsuario=${idUsuario}`);
+            const response = await fetch(`${URL_DETALLES_COMPRA}?idUsuario=${idUsuario}`);
             const data = await response.json();
             setOrdenesCompra(data);
         } catch (error) {
@@ -47,7 +50,7 @@ function OrdenesDeCompraUsuario() {
         });
         if (confirmarCancelacion.isConfirmed) {
             try {
-                const response = await fetch(`http://localhost/proyectoApi/detallesDeCompra.php?idOrdenCompra=${idOrdenCompra}`, {
+                const response = await fetch(`https://mginnovaviones.website/proyectoApi/detallesDeCompra.php?idOrdenCompra=${idOrdenCompra}`, {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',

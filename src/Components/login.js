@@ -5,8 +5,9 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faHouse, faEye, faEyeSlash, } from "@fortawesome/free-solid-svg-icons";
 import imagen1 from "../img/Imagen1.png";
 
+import {URL_USUARIOS} from "../Url" 
+
 export default function Login() {
-  const URL_USER = "http://localhost/proyectoApi/apiUsuario.php";
   const histori = useNavigate();
   const {login } = useContext(AuthContext);
   const [email, setEmail] = useState("");
@@ -17,7 +18,7 @@ export default function Login() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    fetch(URL_USER)
+    fetch(URL_USUARIOS)
       .then((response) => response.json())
       .then((data) => {
         const user = data.find(
@@ -50,10 +51,9 @@ export default function Login() {
 
   return (
     
-    <div className="d-flex flex-column min-vh-100">
-      <main className="flex-grow-1 container mt-5 mb-5">
+    <div className="d-flex flex-column min-vh-100 mt-5">
+      <main className="flex-grow-1 container mt-3 ">
         <div className="row justify-content-center">
-
           <div className=" border col-lg-5 p-4 ">
             <div className="text-center">
               <h1 className="text-primary fs-3 mt-5 mb-3">Iniciar sesión</h1>
@@ -123,14 +123,14 @@ export default function Login() {
           </div>
         </div>
 
-        <div className="d-flex justify-content-start m-4">
+        {/*<div className="d-flex justify-content-start m-4">
           <button
             className="btn btn-primary fs-5"
             onClick={handleHome}
           >
             <FontAwesomeIcon icon={faHouse} />
           </button>
-        </div>
+            </div>*/}
       </main>
     </div>
   );

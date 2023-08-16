@@ -10,7 +10,6 @@ export default function PerfilAdmin() {
       <Navbar2/>
       <br/>
       <Perfil/>
-      
     </div>
   )
 }

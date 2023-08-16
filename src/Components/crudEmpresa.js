@@ -5,6 +5,9 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEdit } from "@fortawesome/free-solid-svg-icons";
 import { Modal, Button } from "react-bootstrap";
 
+import {URL_CLOUDINARY, URL_EMPRESA} from "../Url" 
+
+
 const ProductManagement = () => {
   const [empresa, setEmpresa] = useState([]);
   const [id, setId] = useState("");
@@ -21,16 +24,13 @@ const ProductManagement = () => {
   const [titulo, setTitle] = useState("");
   const [showModal, setShowModal] = useState(false);
 
-  const urlCloudinary = "https://api.cloudinary.com/v1_1/dchgfutbv/image/upload";
-  const URL_INFEMPRESA = "http://localhost/proyectoApi/apiEmpresa.php";
-
   useEffect(() => {
     getInfoEmpresa();
   }, []);
 
   const getInfoEmpresa = async () => {
     try {
-      const response = await axios.get(URL_INFEMPRESA);
+      const response = await axios.get(URL_EMPRESA);
       //console.log(response.data);
       setEmpresa(response.data);
     } catch (error) {
@@ -92,7 +92,7 @@ const ProductManagement = () => {
   ) => {
     try {
       await axios.put(
-        `${URL_INFEMPRESA}?idEmpresa=${idEmpresa}`,
+        `${URL_EMPRESA}?idEmpresa=${idEmpresa}`,
         informacionDeEmpresa
       );
       show_alerta("Información actualizada con éxito", "success");
@@ -110,7 +110,7 @@ const ProductManagement = () => {
     data.append("file", files[0]);
     data.append("upload_preset", "innovaciones");
     try {
-      const res = await fetch(urlCloudinary, {
+      const res = await fetch(URL_CLOUDINARY, {
         method: "POST",
         body: data,
       });

@@ -7,6 +7,8 @@ import axios from "axios";
 
 import "../Css/prodPreview.css";
 
+import {URL_PRODUCTOS,URL_DETALLES_COMPRA} from "../Url" 
+
 function ProductPrewie() {
   const [products, setProducts] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null);
@@ -20,10 +22,6 @@ function ProductPrewie() {
   let userIdUsuario = localStorage.getItem('idUsuario');
 
   const now = new Date();
-
-  const URL_PRODUCTOS = "http://localhost/proyectoApi/apiProducto.php";
-  const URL_ORDEN_PRODUCTO =
-    "http://localhost/proyectoApi/detallesDeCompra.php";
 
   // Obtenemos la fecha en formato constante (yyyy-mm-dd)
   const year = now.getFullYear();
@@ -84,7 +82,7 @@ function ProductPrewie() {
 
     const precioTotal = selectedProduct.precio * cantidad;
 
-    fetch(URL_ORDEN_PRODUCTO, {
+    fetch(URL_DETALLES_COMPRA, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

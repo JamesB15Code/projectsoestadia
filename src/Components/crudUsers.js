@@ -5,6 +5,8 @@ import { show_alerta } from "../funtions";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrash, faEdit, faEye, faEyeSlash,faLock } from "@fortawesome/free-solid-svg-icons";
 
+import {URL_USUARIOS} from "../Url" 
+
 const CrudUsarios = () => {
   const [users, setUsers] = useState([]);
   const [id, setId] = useState("");
@@ -18,14 +20,13 @@ const CrudUsarios = () => {
   const [opcion, setOpcion] = useState("");
   const [titulo, setTitulo] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const url = "http://localhost/proyectoApi/apiUsuario.php";
 
   useEffect(() => {
     getUser();
   }, []);
 
   const getUser = async () => {
-    const res = await axios.get(url);
+    const res = await axios.get(URL_USUARIOS);
     setUsers(res.data);
   };
 
@@ -107,7 +108,7 @@ const CrudUsarios = () => {
     }
   
     try {
-      await axios.post(url, parametros1);
+      await axios.post(URL_USUARIOS, parametros1);
       show_alerta("Guardado", "success");
       const modalreg= document.getElementById("ModalReg");
       modalreg.style.display="none";
@@ -120,7 +121,7 @@ const CrudUsarios = () => {
   
   const editar = async (parametros, idUsuarios) => {
     try {
-      await axios.put(`${url}?idUsuarios=${idUsuarios}`, parametros);
+      await axios.put(`${URL_USUARIOS}?idUsuarios=${idUsuarios}`, parametros);
       show_alerta("Actualizado", "success");
       const modalreg= document.getElementById("ModalReg");
       modalreg.style.display="none";
@@ -144,7 +145,7 @@ const CrudUsarios = () => {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          await axios.delete(`${url}?idUsuarios=${idUsuarios}`);
+          await axios.delete(`${URL_USUARIOS}?idUsuarios=${idUsuarios}`);
           show_alerta("Eliminado", "success");
           getUser();
         } catch (error) {
@@ -286,10 +287,17 @@ const CrudUsarios = () => {
                 />
               </div>
               <div className="input-group mb-3">
-                <select className="form-control" id="pregunta" value={pregunta} onChange={(e) => setPregunta(e.target.value)}>
-                  <option value="">selecciona una pregunta</option>
-                  <option value="¿Cúal es tu color favorito?">¿Cúal es tu color favorito?</option>
-                  <option value="¿cúal es tu comida favorita?">¿cúal es tu comida favorita?</option>
+                <select className="form-select rounded-5 custom-select-style bg-light  text-secondary" id="pregunta" value={pregunta} onChange={(e) => setPregunta(e.target.value)}>
+                <option value="">selecciona una pregunta</option>
+                      <option value="¿Cúal es tu color favorito?">
+                        ¿Cúal es tu color favorito?
+                      </option>
+                      <option value="¿Cúal es tu comida favorita?">
+                        ¿Cúal es tu comida favorita?
+                      </option>
+                      <option value="¿cúal es tu comida favorita?">
+                        ¿Cúal es el nombre de tu mascota?
+                      </option>
                 </select>
               </div>
               <div className="input-group mb-3">

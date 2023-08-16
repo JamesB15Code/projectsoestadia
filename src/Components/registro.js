@@ -8,8 +8,10 @@ import {
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
+import {URL_USUARIOS} from "../Url" 
+
+
 export default function Registro() {
-  const URL_USER = "http://localhost/proyectoApi/apiUsuario.php"; // Reemplaza con la URL de tu API de registro
   const [nombre, setNombre] = useState("");
   const [user, setUser] = useState("");
   const [email, setEmail] = useState("");
@@ -42,13 +44,13 @@ export default function Registro() {
     }
 
     try {
-      const users = await axios.get(URL_USER);
+      const users = await axios.get(URL_USUARIOS);
       if (users.data.find((u) => u.username === user || u.correo === email)) {
         setErrorMessage("El usuario o correo ya existe");
         return;
       }
 
-      const response = await axios.post(URL_USER, {
+      const response = await axios.post(URL_USUARIOS, {
         nombre: nombre,
         username: user,
         contraseña: pass,
@@ -79,9 +81,9 @@ export default function Registro() {
 
   return (
     <div>
-      <main className="container ">
+      <main className="container mt-5">
         <div className="row justify-content-center mt-4">
-          <div className="col-lg-5 mb-2">
+          <div className="col-lg-5 mt-2">
             <div className="">
               <div className="card shadow p-3 ">
                 <div className="text-center">
@@ -154,7 +156,7 @@ export default function Registro() {
                   </div>
                   <div className="input-group mb-3">
                     <select
-                      className="form-control text-secondary rounded-5"
+                      className="form-select rounded-5 custom-select-style bg-light  text-secondary"
                       id="pregunta"
                       onChange={(e) => setPregunta(e.target.value)}
                     >
@@ -197,14 +199,14 @@ export default function Registro() {
               </div>
             </div>
           </div>
-          <div className="">
+         {/*} <div className="">
             <button
               className="btn btn-primary fs-5 float-start"
               onClick={handleLogout}
             >
               <FontAwesomeIcon icon={faHouse} />
             </button>
-          </div>
+            </div>*/}
         </div>
       </main>
     </div>
